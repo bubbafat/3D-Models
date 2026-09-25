@@ -141,7 +141,7 @@ def run(context):
         set_param('cubeSize', '20 mm', 'mm', 'Countdown cube edge length')
         set_param('cubeCount', '3', '', 'Number of cubes displayed at once')
         set_param('cubeClearance', '0.6 mm', 'mm', 'Slack so a cube slides in and out freely')
-        set_param('slotDepth', '15 mm', 'mm', 'Display slot depth -- cube stands cubeSize minus this proud')
+        set_param('slotDepth', '16 mm', 'mm', 'Display slot depth -- cube stands cubeSize minus this proud')
         set_param('cubeEdgeFillet', '1 mm', 'mm', 'Cube edge break')
         set_param('dividerThickness', '2 mm', 'mm', 'Wall between adjacent cube slots')
         set_param('slotCeiling', '2.8 mm', 'mm', 'Material above the display slots')
