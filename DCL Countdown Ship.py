@@ -192,7 +192,7 @@ def run(context):
         boatMaxSag = 1.0              # drop a pod if the hull falls away more than this
         boatSinkMargin = 0.6          # bite past the shallowest point the pod covers
         cube, clearance, divider = 20.0, 0.6, 2.0
-        slotDepth = 15.0
+        slotDepth = 16.0
         cubeN, slotCeiling = 3, 2.8
         cubeEdgeFillet = 1.0
         grooveDepth, grooveHeight, groovePitch = 1.0, 1.2, 3.0
