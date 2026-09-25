@@ -235,7 +235,7 @@ def run(context):
         FONT_ALTERNATES = ['Waltograph', 'waltograph UI', 'WaltographUI',
                            'Waltograph 42', 'Waltograph42']
         FONT_IN_USE = [FONT_NAME]     # set by resolve_font before anything is built
-        digitRecess = 0.6             # 3 layers at 0.2 -- deep enough to hold paint
+        digitRecess = 0.84            # 2 layers at 0.42 -- deep enough to hold paint
         digitInkHeight = 11.0         # visible glyph height -- calibrated, not guessed
         digitEmSeed = 15.0            # starting em size for the calibration pass
         digitBold = False             # Waltograph has no real bold weight
