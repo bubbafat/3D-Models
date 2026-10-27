@@ -1,0 +1,5 @@
+inbox/
+outbox/
+status.json
+__pycache__/
+*.claimed
