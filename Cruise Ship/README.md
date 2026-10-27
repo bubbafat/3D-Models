@@ -1,6 +1,10 @@
 # Cruise Ship Countdown
 
-*Photo to come.*
+![The countdown side: 027 days 'til Disney](photo-countdown.jpg)
+
+![The other side: Let's Book a Cruise!](photo-back.jpg)
+
+![The stern, with the spare cube in the transom pocket](photo-stern.jpg)
 
 A Disney Cruise Line desk countdown. Three 20 mm cubes along the port side show
 the days left, over **Days 'Til Disney**; the starboard side reads **Let's Book
