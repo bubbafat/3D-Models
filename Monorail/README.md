@@ -70,8 +70,9 @@ it still reads as glass in black.
 
 The script also paints the model in Fusion in these colours
 (`PREVIEW_COLOURS`). Fusion's 3MF export keeps those colours, but Bambu Studio
-does not read them: paint in the slicer, or convert them to Bambu's own
-painting first.
+does not read them. [`bambu/`](bambu) converts them to Bambu's own painting
+and makes ready-to-print files, with each part turned and laid out on its
+plate. Otherwise, paint in the slicer.
 
 ## Printing
 
