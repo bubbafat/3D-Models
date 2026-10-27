@@ -66,10 +66,10 @@ use it. Install it by putting the folder in Fusion's add-ins folder; the
 
 ## Requirements
 
-- **Autodesk Fusion** (macOS or Windows).
-- The **Waltograph UI** font, installed for all users, for the models'
-  lettering and digits.
-- **Python 3** for ClaudeBridge's `send.py` client.
+| | Needs |
+|---|---|
+| The models | **Autodesk Fusion** (macOS or Windows), and the **Waltograph UI** font installed for all users, for their lettering and digits |
+| ClaudeBridge | **Autodesk Fusion**, and **Python 3** for its `send.py` client |
 
 ## License
 
