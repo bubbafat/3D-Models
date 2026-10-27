@@ -1,0 +1,12 @@
+{
+	"autodeskProduct":	"Fusion",
+	"type":	"addin",
+	"author":	"",
+	"description":	{
+		"":	"Lets Claude Code run scripts, read results and save views through a local folder"
+	},
+	"version":	"1",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
