@@ -1,7 +1,9 @@
 # 3D-Models
 
 Fusion 360 Python scripts that generate printable models from an empty
-document (e.g. `DCL Countdown Ship.py`).
+document, one folder per model: `Cruise Ship/DCL Countdown Ship.py` and
+`Monorail/Monorail Countdown.py`. Each folder's README says what the model is
+and how it prints. The two models share the same four countdown cubes.
 
 To run a script in the user's Fusion, read its report, measure the result or
 look at it, use the ClaudeBridge add-in — see `ClaudeBridge/CLAUDE.md` before
