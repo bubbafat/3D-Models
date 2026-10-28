@@ -69,6 +69,10 @@ ps = json.loads(zipfile.ZipFile(borrowed).read('Metadata/project_settings.config
 have = len(ps.get('filament_settings_id', []))
 assert have >= len(colours), '{} has {} filaments; the paint needs {}'.format(borrowed, have, len(colours))
 ps['filament_colour'] = colours
+# Nothing in the monorail needs support: the V in the belly, the beam's ridge
+# and the spare pocket's finger notches all print at 40 degrees or steeper, and
+# the pocket's roof is a bridge. Supports would only add scars and a filament.
+ps['enable_support'] = '0'
 files['Metadata/project_settings.config'] = json.dumps(ps, indent=4).encode()
 
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
