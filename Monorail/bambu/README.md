@@ -59,7 +59,11 @@ of flushing, and grams per filament.
 4. `inject_paint.py` writes Bambu's paint onto every triangle of that project,
    checking vertex by vertex that the meshes still match, and swaps in your
    project's settings.
-5. Bambu Studio's command line slices each finished project and reports.
+5. `fine_layers.py` gives the car plate 0.08 mm layers from 16 mm up, where
+   the nose curves off the flank, and moves its prime tower forward to make
+   room. `NOSE_FROM`, `NOSE_LAYER` and `TOWER_X`/`TOWER_Y` at the top of
+   `make_print_files.sh` set these.
+6. Bambu Studio's command line slices each finished project and reports.
 
 ## What Bambu Studio does that you need to know
 
@@ -83,6 +87,14 @@ model. It was worked out by testing against Bambu Studio 2.07.
   the wrong triangles; here it put gold on the windshield.
 - **Absolute output folder.** `--outputdir` must be an absolute path. A
   relative one fails with `Unable to open the file … .tmp`.
+- **Layer heights by height.** A height range with its own layer height is
+  stored in `Metadata/layer_config_ranges.xml`, as `<objects><object id="N">
+  <range min_z max_z><option opt_key="layer_height">`. `N` counts objects in
+  the order of their ids, not the order `model_settings.config` lists them in.
+- **One layer plan per plate with a prime tower.** With the prime tower on,
+  Bambu slices only if every object has the same layer heights, so every object
+  on the car plate gets the same range. Finer layers also make the tower
+  deeper; at the usual spot by the back edge, the tower ran off the bed.
 - **Check by slicing.** `BambuStudio --slice 0 --outputdir <absolute folder>
   <project.3mf>` writes `result.json`, with `filament_change_times`,
   `total_predication` (seconds) and grams per filament. If the car plate shows

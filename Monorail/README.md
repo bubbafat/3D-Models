@@ -78,17 +78,25 @@ plate. Otherwise, paint in the slicer.
 ## Printing
 
 Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers and
-PLA:
+PLA, 15% gyroid infill, and 0.08 mm layers on the car's nose:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car halves and pins | 11.1 h | 217 | ~200 g |
+| Car halves and pins | 15.6 h | 303 | ~241 g |
 | Beam and foot | 1.1 h | 0 | 37 g |
 | Cubes (optional) | 3.7 h | 70 | 62 g |
 
 The car plate's changes come from the nose: lying flat, it stands upright, so
 its windshield and red lip put three colours in almost every layer. With the
 nose and tail plain white it would be about 7.4 h.
+
+**The nose's layers.** Each half lies on its split face, so near the top of the
+half the nose curves away from the flank as a shallow slope. There, 0.2 mm
+layers print as steps up to 2 mm wide, and they showed on the first test print.
+From 16 mm up the car plate uses 0.08 mm layers instead. Test pieces at 0.2,
+0.12 and 0.08 mm all printed acceptably, but 0.08 mm looked and felt the best.
+It costs about 40 g of filament and 4.5 h per car plate, almost all of it in
+extra colour changes, since every colour on the car meets in that band.
 
 With tree supports enabled, the only supports are under the beam channel's lip
 and the tail pocket's roof.
