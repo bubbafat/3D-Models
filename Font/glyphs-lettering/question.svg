@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 0 800 1100" width="400" height="550">
+  <!-- The pen lines for "?", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       lettering.json; each circle is a ball terminal. Only what is inside
+       the group is used; the grey lines are guides (descender, baseline,
+       x-height, cap height, ascender). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="-100" y1="970" x2="700" y2="970"/>
+    <line x1="-100" y1="800" x2="700" y2="800"/>
+    <line x1="-100" y1="280" x2="700" y2="280"/>
+    <line x1="-100" y1="100" x2="700" y2="100"/>
+    <line x1="-100" y1="60" x2="700" y2="60"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 110 560 C 120 640 190 680 260 680 C 340 680 400 630 400 560 C 400 480 330 450 280 420 C 250 400 246 360 248 300"/>
+    <circle cx="250" cy="80" r="62" fill="#000"/>
+    <circle cx="110" cy="556" r="54" fill="#000"/>
+  </g>
+</svg>

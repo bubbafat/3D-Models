@@ -1,13 +1,17 @@
 # Cruise Ship Countdown
 
-![The countdown side: 027 days 'til Disney](photo-countdown.jpg)
+![The countdown side of the first print, showing 027](photo-countdown.jpg)
 
 ![The other side: Let's Book a Cruise!](photo-back.jpg)
 
 ![The stern, with the spare cube in the transom pocket](photo-stern.jpg)
 
+*The first print, made before the ship moved to this repository's own
+[fonts](../Font). It now reads **Days 'Til We Sail**, and the cubes no longer
+carry a Mickey head under the 6 and the 9.*
+
 A Disney Cruise Line desk countdown. Three 20 mm cubes along the port side show
-the days left, over **Days 'Til Disney**; the starboard side reads **Let's Book
+the days left, over **Days 'Til We Sail**; the starboard side reads **Let's Book
 a Cruise!** for when no trip is booked yet. Two raked funnels carry Mickey
 emblems, lifeboats line the hull, and the fourth cube lives in a pocket in the
 transom.
@@ -17,9 +21,10 @@ Python script, starting from an empty document. Nothing is modelled by hand.
 
 ## Build it
 
-1. Install the **Waltograph UI** font for all users (Font Book → *Install for:
-   All Users*), then restart Fusion — it reads its font list at launch. The
-   script tells you if it cannot find the font.
+1. Install this repository's two fonts, `CountdownDigits-Regular.ttf` and
+   `CountdownLettering-Regular.ttf` from [`Font/build`](../Font/build), with
+   Font Book, then restart Fusion — it reads its font list at launch. Without
+   them the script falls back to Waltograph UI, and its report says so.
 2. In Fusion, open a new, empty design.
 3. **Utilities → Add-ins → Scripts and Add-ins** (Shift+S) → **+** → *Create
    script*, Python. Open its folder and replace the generated `.py` with
@@ -64,13 +69,16 @@ same digits, same fit — so one set works in either model.
 Four cubes, not three, because the arithmetic demands it: to show every count
 from 000 to 365, the digits 0–3 each need three cubes (000, 111, 222, 333) and
 4–9 each need two (344, 355, 266, ...). That is 24 faces, which four cubes
-have exactly and three cannot — so no face is blank, and a small Mickey head
-under the 6 and the 9 tells them apart. The script re-proves all 366 counts
-every time it runs.
+have exactly and three cannot — so no face is blank. The digits are in
+[Countdown Digits](../Font), where the 9 is the 6 upside down: there is nothing
+to tell apart, since either face reads as a 6 one way up and a 9 the other.
+(`MARK_6_AND_9` puts back the small Mickey head that used to mark them.) The
+script re-proves all 366 counts every time it runs.
 
 ## Changing it
 
-The settings are at the top of the script: the lettering (`HULL_TEXT`), hull
+The settings are at the top of the script: the lettering (`HULL_TEXT`), the
+fonts (`DIGIT_FONTS`, `TEXT_FONTS`), hull
 and deck proportions, funnel placement, and the fits (`cubeClearance`,
 `spareClearance`). Layout rules are checked as it builds; if a change makes
 features collide, it stops and says which.
@@ -82,6 +90,9 @@ lifeboats are now dropped wherever the hull falls away under them, the
 transom pocket gained finger notches, the funnel sockets got relief at the
 mouth, the lettering got bigger, and the second side got its own wording.
 
-The cube digits are now recessed 0.84 mm (exactly two 0.42 mm walls) instead
-of 0.6 mm, to fix ragged edges on the printed digits; that change has not been
-checked in a print yet.
+Two changes have not been checked in a print yet:
+
+- The cube digits are recessed 0.84 mm (exactly two 0.42 mm walls) instead of
+  0.6 mm, to fix ragged edges on the printed digits.
+- The lettering and digits are in this repository's own fonts, with the new
+  wording.

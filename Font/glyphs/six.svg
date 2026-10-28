@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 1000" width="290" height="500">
+  <!-- The pen lines for "six", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       font.json; each circle is a ball terminal. Only what is inside the
+       group is used; the grey lines are guides (baseline and figure height). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="0" y1="800" x2="580" y2="800"/>
+    <line x1="0" y1="100" x2="580" y2="100"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 418 584 C 448 608 438 640 404 650 C 340 670 270 656 210 590 C 144 520 114 380 124 250 C 134 110 206 46 292 46 C 394 46 464 114 464 216 C 464 324 386 398 294 398 C 212 398 150 344 128 268 C 122 246 120 224 124 200"/>
+    <circle cx="418" cy="584" r="52" fill="#000"/>
+  </g>
+</svg>

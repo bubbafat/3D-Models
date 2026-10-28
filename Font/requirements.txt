@@ -1,0 +1,5 @@
+fonttools
+pyclipper
+pillow
+numpy
+scipy
