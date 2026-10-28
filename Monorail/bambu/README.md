@@ -22,7 +22,7 @@ export keeps the model's colours, but Bambu Studio ignores them.
 - **A Bambu Studio project of yours with four filaments set up.** Any `.3mf`
   you have printed from with your AMS will do. The print files take your
   printer, process and filament settings from it; nothing in that project is
-  changed.
+  changed. Supports are always turned off, since the monorail needs none.
 
 ## Run it
 

@@ -46,9 +46,12 @@
 #   cube slots opening upward (no bridging), the lettering on the top surface
 #   (best finish), and every colour change in the first and last few layers --
 #   so the AMS purges a handful of times instead of once per layer. The car is
-#   widest at the split, so nothing overhangs but the lip of belly, at most
-#   3.5 mm, over the beam channel. Nothing sticks out of either split face: both
-#   halves carry sockets and the pins are separate parts.
+#   widest at the split, and the beam's top is a ridge that seats in a V in
+#   the belly, so no face is flatter than minPrintSlope in print -- nothing
+#   needs support. The one span over air is the spare pocket's roof, a bridge
+#   held at both edges and the back; its finger notches are in the walls that
+#   stand upright in print, so they leave the bridge whole. Nothing sticks out of either split face:
+#   both halves carry sockets and the pins are separate parts.
 #
 #   Set SPLIT_CAR = False below to get one body instead.
 #
@@ -178,7 +181,7 @@ def run(context):
         set_param('beamWidth', '10 mm', 'mm', 'Track beam width -- real Mark VI proportion to the car')
         set_param('beamDepth', '13.5 mm', 'mm', 'Track beam depth -- about 10 mm of it shows below the car')
         set_param('beamLength', '168 mm', 'mm', 'Track beam length')
-        set_param('beamFit', '0.8 mm', 'mm', 'Slack across the belly channel over the beam, total')
+        set_param('grooveFit', '0.3 mm', 'mm', 'Clearance between the beam ridge and the V in the belly, square to the faces')
         set_param('footSize', '130 mm', 'mm', 'Length of the plate the two pylons plug into')
         set_param('cubeSize', '20 mm', 'mm', 'Countdown cube edge length')
         set_param('cubeCount', '3', '', 'Number of cubes displayed at once')
@@ -226,16 +229,22 @@ def run(context):
 
 
         # The track beam, in real Mark VI proportion to the car: narrow, showing
-        # about a fifth of the car's height below the belly, and straight. The
-        # belly straddles its top through a straight channel, so the car sits
-        # on the whole run. The straddle is the one
-        # overhang in the car halves -- at most beamCrestZ, printed off material
-        # in the same layer, as the first version's 4 mm channel was.
+        # about a fifth of the car's height below the belly, and straight. Its
+        # hidden top, inside the belly, is a ridge rising from the belly line to
+        # beamCrestZ, and the belly has a matching V along its flat run, so the
+        # car sits on the whole run and centres itself sideways. A flat-topped
+        # beam in a square channel left a lip in each split half that needed
+        # support; the V's faces print at minPrintSlope or steeper, and so do
+        # the ridge's, with the beam on its side.
         beamHalfW, beamDepth = 5.0, 13.5
         beamHalfLen = 84.0            # ends inside the car: never past nose or tail
-        beamCrestZ = 3.5              # beam top, up inside the belly
-        beamFit = 0.8                 # total, across the channel
-        channelHalfW = beamHalfW + beamFit / 2.0
+        beamCrestZ = 3.5              # ridge apex, up inside the belly
+        grooveFit = 0.3               # square to the faces; the car rests on them
+        minPrintSlope = 40.0          # degrees from the bed; the slicer supports
+                                      # faces flatter than 30
+        ridgeRise = beamCrestZ / beamHalfW          # dz per mm out from the apex
+        grooveApexZ = beamCrestZ + grooveFit * math.sqrt(1.0 + ridgeRise ** 2)
+        grooveHalfW = grooveApexZ / ridgeRise       # where the V meets the belly
 
         def beam_top(x):
             return beamCrestZ
@@ -243,14 +252,17 @@ def run(context):
         def beam_bottom(x):
             return beamCrestZ - beamDepth
 
-        # A locating bump at mid-span, 45-degree flanks, that drops into a
-        # matching notch in the channel: the car goes back dead centre every
-        # time, with under half a millimetre of play along the beam.
-        bumpH, bumpBase, bumpFit = 2.0, 4.0, 0.3   # height, half-width at the root
-        bumpTop = bumpBase - bumpH                  # half-width at the top: 45 degrees
+        # A locating bump at mid-span: the ridge stands bumpH taller there, still
+        # rising from the belly line, so steeper, with 45-degree ramps along the
+        # beam. It drops into a matching notch in the V: the car goes back dead
+        # centre every time, with under half a millimetre of play along the beam.
+        bumpH, bumpBase, bumpFit = 2.0, 4.0, 0.3   # height, half-length at the root
+        bumpTop = bumpBase - bumpH                  # half-length at the top: 45 degrees
         notchBase = bumpBase + bumpFit * math.sqrt(2.0)
         notchTop = bumpTop + bumpFit * (math.sqrt(2.0) - 1.0)
         notchH = bumpH + bumpFit
+        bumpRise = (beamCrestZ + bumpH) / beamHalfW
+        notchApexZ = beamCrestZ + bumpH + bumpFit * math.sqrt(1.0 + bumpRise ** 2)
 
         # Two pylons, spaced out under the beam, the same width as the beam,
         # so beam and pylons are a single flat profile that prints on its side
@@ -310,12 +322,16 @@ def run(context):
                                       # seized on the ship
         spareDepth = cube + 1.2       # the cube sits 1.2 mm in from the tail face
         sparePocketSize = cube + spareClearance
-        spareZ0 = 12.75               # in the tail face, under the coupler; the
-                                      # pocket's centre stays at z 23.6
+        spareZ0 = lightZ0 + (lightZ1 - lightZ0 - sparePocketSize) / 2.0
+                                      # centred on the tail lights, which leaves
+                                      # room for the top notch under the coupler
         spareZ1 = spareZ0 + sparePocketSize
         spareCentreZ = (spareZ0 + spareZ1) / 2.0
-        spareGripDia = 6.0            # finger notch in each pocket side wall
-        spareGripDepth = 8.0
+        spareGripR = 3.0              # finger notch in the pocket's top and bottom
+        spareGripDepth = 8.0          # walls: they stand upright in print. Notches
+                                      # in the side walls were holes in the roof
+                                      # bridge, and fell apart unsupported
+        spareGripHalfW = spareGripR * math.sqrt(2.0)   # 45-degree flanks off the round
 
         pinDia, pinH, pinFit, socketExtra = 4.0, 3.0, 0.4, 0.5
         PIN_XZ = [(-72.0, 40.0), (-20.0, 16.0), (50.0, 30.0)]
@@ -490,17 +506,22 @@ def run(context):
 
         # The beam, and the belly straddling it along its flat run.
         flatX0, flatX1 = tailStartX, noseStartX
-        straddleCrest = beamCrestZ
         straddleEnds = min(beam_top(flatX0), beam_top(flatX1))
-        require(straddleCrest <= 4.0,
-                'The belly hangs {:.1f} mm over the beam -- more than the '
-                '4 mm a split half prints as an unsupported lip.'.format(straddleCrest))
+        # In print a car half lies on its split face and the beam on its side,
+        # so a ridge face rising r mm per mm across prints at atan(1 / r) from
+        # the bed, in both.
+        ridgeSlope = math.degrees(math.atan(1.0 / ridgeRise))
+        bumpSlope = math.degrees(math.atan(1.0 / bumpRise))
+        require(min(ridgeSlope, bumpSlope) >= minPrintSlope,
+                'The ridge faces would print at {:.0f} and {:.0f} degrees from the bed; '
+                'below {:.0f} they need support. Lower beamCrestZ or bumpH, or widen '
+                'the beam.'.format(ridgeSlope, bumpSlope, minPrintSlope))
         require(straddleEnds > 0.5,
                 'The belly only covers {:.1f} mm of the beam at '
                 'the ends of its flat run. Raise the beam top.'
                 .format(straddleEnds))
-        require(channelHalfW < carHalfW - bodyRBot - 3.0,
-                'The beam channel is wider than the flat of the belly.')
+        require(grooveHalfW < carHalfW - bodyRBot - 3.0,
+                'The V for the beam is wider than the flat of the belly.')
         require(beamHalfLen <= min(carX1, -carX0) - 2.0,
                 'The beam runs to x +/-{:.0f}, past the car\'s nose or tail.'
                 .format(beamHalfLen))
@@ -525,14 +546,18 @@ def run(context):
                 .format(spareZ0, spareZ1, tailCap[2], tailCap[3], couplerZ0))
         require(carX0 + spareDepth < arrayX0 - 2.0,
                 'The spare pocket reaches the display slots.')
-        gripWall = tailCap[1] - sparePocketSize / 2.0 - spareGripDia / 2.0
-        require(gripWall > 1.5,
-                'Finger notches would leave only {:.2f} mm of side wall.'.format(gripWall))
+        require(spareZ0 - spareGripR > grooveApexZ + 2.5
+                and spareZ1 + spareGripR < couplerZ0 - 1.0,
+                'Finger notches run z {:.1f} to {:.1f}, too close to the V ({:.1f}) or the '
+                'coupler ({:.1f}).'.format(spareZ0 - spareGripR, spareZ1 + spareGripR,
+                                           grooveApexZ, couplerZ0))
+        require(spareGripHalfW < sparePocketSize / 2.0 - 3.0,
+                'The finger notches reach the pocket roof in print.')
         require(couplerZ1 < tailCap[3] - 1.0 and couplerHalfW < tailCap[1] - 2.0,
                 'The tail coupler does not fit on the tail face.')
-        require(lightY - lightHalfW > sparePocketSize / 2.0 + spareGripDia / 2.0 + 0.3
+        require(lightY - lightHalfW > sparePocketSize / 2.0 + 2.0
                 and lightY + lightHalfW < tailCap[1] - 1.0,
-                'The tail lights do not fit between the finger notches and the edge.')
+                'The tail lights do not fit between the spare pocket and the edge.')
         require(sweepZ <= lightZ0 and lightZ1 <= stripeZ1,
                 'The tail lights are not inside the red at the tail face.')
         for (px, pz) in PIN_XZ:
@@ -913,6 +938,20 @@ def run(context):
                     lines.addByTwoPoints(pts[i], pts[j])
             return extrude_symmetric(sk, 2.0 * halfSpan, bodyName or ('Tool_' + name))
 
+        def end_prism(name, corners, x0, x1, bodyName=None):
+            """A solid drawn in end view, closed straight lines through global
+            (y, z) corners, pushed along x from x0 to x1."""
+            sk = root.sketches.add(plane_through(
+                'Tool_P_' + name, root.yZConstructionPlane, 'x', (x0 + x1) / 2.0))
+            sk.name = 'Tool_Sk_' + name
+            to_local = local_mapper(sk, ('y', 'z'))
+            sp = sk.sketchPoints
+            pts = [sp.add(to_local(a, b)) for a, b in corners]
+            lines = sk.sketchCurves.sketchLines
+            for i in range(len(pts)):
+                lines.addByTwoPoints(pts[i], pts[(i + 1) % len(pts)])
+            return extrude_symmetric(sk, x1 - x0, bodyName or ('Tool_' + name))
+
         # ------------------------------------------------------- text machinery
         def text_tool(sketchName, text, emHeight, depth, font):
             """Text prism standing on the world XY plane.
@@ -1284,22 +1323,37 @@ def run(context):
         # Under the belly, straight like the beam, so the car sits on the
         # beam along its whole length, with the notch for the locating bump at
         # mid-span. Run past both ends of the car.
+        # The V is the ridge grown by grooveFit; the notch is the bump's steeper
+        # ridge grown by bumpFit, cut off by the bump's ramps grown the same.
         channelX = carX1 + 5.0
         channelBefore = volume_mm3('Car')
-        channelTool = side_prism('Channel', [
-            (-channelX, beam_top(-channelX)), (-notchBase, beam_top(-notchBase)),
+        vBottom = -3.0
+        grooveTool = end_prism('Channel', [
+            (-(grooveApexZ - vBottom) / ridgeRise, vBottom),
+            ((grooveApexZ - vBottom) / ridgeRise, vBottom), (0.0, grooveApexZ)],
+            -channelX, channelX)
+        notchRidge = end_prism('NotchRidge', [
+            (-(notchApexZ - vBottom) / bumpRise, vBottom),
+            ((notchApexZ - vBottom) / bumpRise, vBottom), (0.0, notchApexZ)],
+            -notchBase - 1.0, notchBase + 1.0)
+        notchRamps = side_prism('NotchRamps', [
+            (-notchBase, vBottom), (-notchBase, beamCrestZ),
             (-notchTop, beamCrestZ + notchH), (notchTop, beamCrestZ + notchH),
-            (notchBase, beam_top(notchBase)), (channelX, beam_top(channelX)),
-            (channelX, -3.0), (-channelX, -3.0)],
-            channelHalfW)
-        cut_from('Car', [channelTool])
-        crestOff = notchBase + 3.0    # just past the notch, where the channel is plain
+            (notchBase, beamCrestZ), (notchBase, vBottom)],
+            (notchApexZ - vBottom) / bumpRise + 1.0)
+        combine_bodies(notchRidge.name, [notchRamps],
+                       adsk.fusion.FeatureOperations.IntersectFeatureOperation)
+        join_into(grooveTool.name, [body_named(notchRidge.name)])
+        cut_from('Car', [body_named(grooveTool.name)])
+        crestOff = notchBase + 3.0    # just past the notch, where the V is plain
         require(volume_mm3('Car') < channelBefore - 100.0
-                and is_outside('Car', crestOff, 0.0, beam_top(crestOff) - 0.4)
-                and is_inside('Car', crestOff, 0.0, beam_top(crestOff) + 0.4)
-                and is_inside('Car', 0.0, channelHalfW + 1.0, 1.0),
-                'The beam channel is not {:.1f} mm up into the belly.'
-                .format(beamCrestZ))
+                and is_outside('Car', crestOff, 0.0, grooveApexZ - 0.3)
+                and is_inside('Car', crestOff, 0.0, grooveApexZ + 0.3)
+                and is_outside('Car', crestOff, 3.0, 1.0)
+                and is_inside('Car', crestOff, 3.0, 2.5)
+                and is_inside('Car', 0.0, grooveHalfW + 1.0, 1.0),
+                'The V for the beam is not {:.1f} mm up into the belly.'
+                .format(grooveApexZ))
         require(is_outside('Car', 0.0, 0.0, beamCrestZ + bumpH)
                 and is_inside('Car', 0.0, 0.0, beamCrestZ + notchH + 0.4),
                 'The locating notch is not over mid-span.')
@@ -1313,19 +1367,28 @@ def run(context):
                 and is_inside('Car', carX0 + spareDepth + 1.0, 0.0, spareCentreZ),
                 'The spare pocket is not {:.1f} mm deep in the tail face.'.format(spareDepth))
 
-        # Finger notches in the pocket's side walls. Clearance alone stops the
-        # cube seizing, but with it sitting flush there is still nothing to
-        # grip, so the side walls get scalloped -- one in each half of the car.
+        # Finger notches in the pocket's top and bottom walls. Clearance lets
+        # the cube fall out, but it sits 1.2 mm in, so there is nothing to grip
+        # without them. Each is split down the middle by the split face, and in
+        # print each half rises off the bed: a round where the finger goes, then
+        # 45-degree flanks up to the pocket wall, so no part of it is a roof.
+        # The ship's notches go in its side walls, which are its upright ones.
         gripSk = root.sketches.add(plane_through(
             'Cut_P_SpareGrip', root.yZConstructionPlane, 'x', carX0 + spareGripDepth / 2.0))
         gripSk.name = 'Cut_SpareGrip'
         gripLocal = local_mapper(gripSk, ('y', 'z'))
-        for sgn in (-1.0, 1.0):
-            gripSk.sketchCurves.sketchCircles.addByCenterRadius(
-                gripLocal(sgn * sparePocketSize / 2.0, spareCentreZ),
-                mm(spareGripDia / 2.0))
-        require(gripSk.profiles.count >= 2,
-                'Finger notch sketch produced {} profiles, expected at least 2.'
+        gripLines = gripSk.sketchCurves.sketchLines
+        gripTan = spareGripR / math.sqrt(2.0)
+        for wallZ, into in ((spareZ0, -1.0), (spareZ1, 1.0)):
+            pts = [gripSk.sketchPoints.add(gripLocal(y, wallZ + into * dz)) for y, dz in (
+                (-spareGripHalfW, -1.0), (-spareGripHalfW, 0.0), (-gripTan, gripTan),
+                (gripTan, gripTan), (spareGripHalfW, 0.0), (spareGripHalfW, -1.0))]
+            for i in (0, 1, 3, 4, 5):
+                gripLines.addByTwoPoints(pts[i], pts[(i + 1) % 6])
+            gripSk.sketchCurves.sketchArcs.addByThreePoints(
+                pts[2], gripLocal(0.0, wallZ + into * spareGripR), pts[3])
+        require(gripSk.profiles.count == 2,
+                'Finger notch sketch produced {} profiles, expected 2.'
                 .format(gripSk.profiles.count))
         gripIn = extrudes.createInput(all_profiles(gripSk),
                                       adsk.fusion.FeatureOperations.CutFeatureOperation)
@@ -1333,6 +1396,13 @@ def run(context):
         gripIn.setDistanceExtent(True, adsk.core.ValueInput.createByString(
             '{} mm'.format(symmetric_value(spareGripDepth))))
         extrudes.add(gripIn)
+        for wallZ, into in ((spareZ0, -1.0), (spareZ1, 1.0)):
+            require(is_outside('Car', carX0 + 1.0, 0.0, wallZ + into * (spareGripR - 0.3))
+                    and is_inside('Car', carX0 + 1.0, 0.0, wallZ + into * (spareGripR + 0.3))
+                    and is_inside('Car', carX0 + spareGripDepth + 0.5, 0.0, wallZ + into * 1.0)
+                    and is_inside('Car', carX0 + 1.0, spareGripHalfW + 0.3, wallZ + into * 0.3),
+                    'The finger notch at z {:.1f} is not {:.0f} mm deep and {:.0f} mm long.'
+                    .format(wallZ, spareGripR, spareGripDepth))
 
         # ========================================================== lettering
         # Raised, and joined into the car as one body. A flush inlay is
@@ -1749,6 +1819,24 @@ def run(context):
             (-iX, beam_bottom(-iX)), (-iX, pylonZ0), (-oX, pylonZ0),
             (-oX, beam_bottom(-oX)), (-bL, beam_bottom(-bL))],
             beamHalfW, bodyName='Beam')
+        # Trim the top to the ridge, and to the steeper ridge over the bump.
+        zLow = pylonZ0 - 5.0
+        ridgeKeep = end_prism('RidgeKeep', [
+            (-beamHalfW - 1.0, zLow), (beamHalfW + 1.0, zLow),
+            (beamHalfW + 1.0, beamCrestZ - ridgeRise * (beamHalfW + 1.0)),
+            (0.0, beamCrestZ),
+            (-beamHalfW - 1.0, beamCrestZ - ridgeRise * (beamHalfW + 1.0))],
+            -bL - 1.0, bL + 1.0)
+        bumpKeep = end_prism('BumpKeep', [
+            (-beamHalfW - 1.0, zLow), (beamHalfW + 1.0, zLow),
+            (beamHalfW + 1.0, beamCrestZ + bumpH - bumpRise * (beamHalfW + 1.0)),
+            (0.0, beamCrestZ + bumpH),
+            (-beamHalfW - 1.0, beamCrestZ + bumpH - bumpRise * (beamHalfW + 1.0))],
+            -bumpBase, bumpBase)          # no further: below the crest nothing else
+                                          # bounds it, and the notch ends at notchBase
+        join_into(ridgeKeep.name, [bumpKeep])
+        combine_bodies('Beam', [body_named(ridgeKeep.name)],
+                       adsk.fusion.FeatureOperations.IntersectFeatureOperation)
         paint_body('Beam', 'grey')
         beamLo, beamHi = extent_of([body_named('Beam')])
         require(abs((beamHi[0] - beamLo[0]) - 2.0 * bL) < 0.5
@@ -1761,6 +1849,19 @@ def run(context):
                 and is_outside('Beam', bL - 1.0, 0.0, beam_top(bL) + 0.5)
                 and is_inside('Beam', bL - 1.0, 0.0, beam_top(bL) - 0.5),
                 'The beam top is not straight, or lost its bump.')
+        require(is_inside('Beam', bL - 1.0, 3.0, 1.0)
+                and is_outside('Beam', bL - 1.0, 4.0, 1.0)
+                and is_inside('Beam', bL - 1.0, beamHalfW - 0.3, -0.5)
+                and is_inside('Beam', 0.0, 3.5, 1.0)
+                and is_outside('Beam', 0.0, 4.5, 1.0),
+                'The beam top is not the ridge it should be.')
+        for carBody in CAR_BODIES:
+            gap = app.measureManager.measureMinimumDistance(
+                body_named('Beam'), body_named(carBody)).value * 10.0
+            require(gap > grooveFit - 0.02,
+                    'The beam comes within {:.2f} mm of {}, against the {:.2f} mm the V '
+                    'should leave -- the ridge and the V do not match.'
+                    .format(gap, carBody, grooveFit))
         require(all(is_inside('Beam', sgn * pylonX, 0.0, footTopZ - 1.0) for sgn in (-1.0, 1.0))
                 and is_outside('Beam', 0.0, 0.0, footTopZ - 1.0),
                 'The pylons are not standing at x +/-{:.0f}.'.format(pylonX))
@@ -1860,8 +1961,9 @@ def run(context):
                       'Symmetric extrude probed as {}.\n'
                       'Overall {:.1f} x {:.1f} x {:.1f} mm, measured. Car {:.0f} mm long, '
                       '{:.0f} wide, {:.0f} tall.\n'
-                      'Beam {:.0f} x {:.0f} x {:.1f} mm, straight; the belly straddles '
-                      'it {:.1f} mm deep all along its flat, {:.1f} mm slack across.\n'
+                      'Beam {:.0f} x {:.0f} x {:.1f} mm, straight, its top a ridge {:.1f} mm '
+                      'high that seats in a V along the belly, {:.1f} mm clear of it; '
+                      'faces print at {:.0f} and {:.0f} degrees.\n'
                       'Two pylons {:.0f} mm apart, {:.0f} mm showing, into a {:.0f} x '
                       '{:.0f} mm foot.\n'
                       'Locating bump {:.1f} mm at mid-span; the car has {:.2f} mm of '
@@ -1871,7 +1973,7 @@ def run(context):
                       'the frames, {:.1f} mm of back wall.\n'
                       'Frames {:.1f} mm proud, z {:.1f} to {:.1f}.\n'
                       'Spare pocket in the tail face: {:.1f} mm slack, z {:.1f} to {:.1f}, '
-                      'notched {:.0f} mm each side.\n'
+                      'finger notches top and bottom, {:.0f} mm deep and {:.1f} mm wide.\n'
                       'Livery as real steps, not split faces: band {:.1f} mm, windshield '
                       '{:.1f} mm, stripe {:.1f} mm; tools came apart into {}/{}/{} pieces.\n\n'
                       'Fonts: digits in "{}"{}, lettering in "{}"{}.\n'
@@ -1895,13 +1997,13 @@ def run(context):
                               allHi[0] - allLo[0], allHi[1] - allLo[1], allHi[2] - allLo[2],
                               carLen, 2.0 * carHalfW, bodyZ1,
                               2.0 * beamHalfLen, 2.0 * beamHalfW, beamDepth,
-                              straddleEnds, beamFit,
+                              straddleEnds, grooveFit, ridgeSlope, bumpSlope,
                               2.0 * pylonX, pylonShow, 2.0 * footHalfX, 2.0 * footHalfY,
                               bumpH, notchBase - bumpBase,
                               noseLen, tailRound,
                               slotDepth, cubeProud, slotFloorY,
                               frameProud, frameZ0, frameZ1,
-                              spareClearance, spareZ0, spareZ1, spareGripDia,
+                              spareClearance, spareZ0, spareZ1, spareGripR, 2.0 * spareGripHalfW,
                               bandDepth, glassDepth, stripeDepth,
                               bandPieces, glassPieces, stripePieces,
                               digitFont,

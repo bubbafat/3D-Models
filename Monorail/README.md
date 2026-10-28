@@ -50,7 +50,10 @@ Eleven bodies, 176.6 × 56 × 76 mm assembled.
 
 The car is split down the middle so each half lies flat on its cut face: the
 cube slots open upward, the lettering is on the top surface, and nothing
-overhangs except a 3.5 mm lip over the beam channel.
+needs support. The beam's top is a ridge that seats in a V in the belly, so the
+belly has no ledge to overhang. The spare pocket's roof is a bridge, and its
+finger notches are cut in its top and bottom walls, which stand upright in
+print.
 
 ## Colours
 
@@ -78,13 +81,13 @@ plate. Otherwise, paint in the slicer.
 ## Printing
 
 Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers and
-PLA, 15% gyroid infill, and 0.08 mm layers on the car's nose:
+PLA, 8% lightning infill, no supports, and 0.08 mm layers on the car's nose:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car halves and pins | 15.6 h | 303 | ~241 g |
-| Beam and foot | 1.1 h | 0 | 37 g |
-| Cubes (optional) | 3.7 h | 70 | 62 g |
+| Car halves and pins | 13.9 h | 298 | ~204 g |
+| Beam and foot | 0.9 h | 0 | 29 g |
+| Cubes (optional) | 3.6 h | 70 | 60 g |
 
 The car plate's changes come from the nose: lying flat, it stands upright, so
 its windshield and red lip put three colours in almost every layer. With the
@@ -98,12 +101,19 @@ From 16 mm up the car plate uses 0.08 mm layers instead. Test pieces at 0.2,
 It costs about 40 g of filament and 4.5 h per car plate, almost all of it in
 extra colour changes, since every colour on the car meets in that band.
 
-With tree supports enabled, the only supports are under the beam channel's lip
-and the tail pocket's roof.
+**No supports.** Every face that looks down in print slopes at 40° or
+steeper, apart from a few short flat spans that print fine unsupported: the
+pin sockets' ends, the tail lights' 2 mm undersides, and the spare pocket's
+roof. The roof is a 21.7 mm bridge held on three sides, like the ship's
+transom pocket. The pocket's finger notches used to be in its side walls.
+Lying on the split face, those walls are the roof, so the notches were holes
+in the bridge, and they fell apart on a test print. They are now in the top
+and bottom walls, rounded where the finger goes, with 45° flanks.
 
 **Assembly.** Push the pins into one half's sockets, glue the halves together,
-and glue the pylons into the foot. The car lifts on and off the beam; a bump on
-top of the beam drops into a notch in the car, so it always sits centred.
+and glue the pylons into the foot. The car lifts on and off the beam. Its V seats
+on the beam's ridge, and a bump on the ridge drops into a notch in the V, so
+it always sits centred.
 
 ## The cubes
 
@@ -130,7 +140,7 @@ script re-proves all 366 counts every time it runs.
 ## Changing it
 
 The settings are at the top of the script: the lettering (`CAR_TEXT`), the
-fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `beamFit`, `pinFit`, `socketFit`),
+fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `grooveFit`, `pinFit`, `socketFit`),
 `PREVIEW_COLOURS`, and `SPLIT_CAR` to build the car as one piece. Every layout
 rule is checked before anything is built, and again with measurements after:
 if a change makes two features collide, the script stops and says which, rather
