@@ -15,6 +15,10 @@ B=/Applications/BambuStudio.app/Contents/MacOS/BambuStudio
 P=/Applications/BambuStudio.app/Contents/Resources/profiles/BBL
 # Only for the Bambu command line's first pass; the finished projects get SETTINGS instead.
 M="$P/machine/Bambu Lab P1S 0.4 nozzle.json"; PR="$P/process/0.20mm Standard @BBL X1C.json"; FI="$P/filament/Bambu PLA Basic @BBL X1C.json"
+# The car plate gets 0.08 mm layers from 16 mm up, where the nose curves off the
+# flank (see fine_layers.py); test prints settled on that. Its prime tower moves
+# forward so the deeper tower still fits on the bed.
+NOSE_FROM=16; NOSE_LAYER=0.08; TOWER_X=130; TOWER_Y=160
 WORK=$(mktemp -d -t monorail-bambu)
 mkdir -p "$OUT"
 echo "== working in $WORK"
@@ -33,6 +37,9 @@ for spec in "car plate:4:#FFFFFF,#161616,#C12E1F,#FFF144" "cubes:2:#FFFFFF,#1616
       --export-3mf "proj.3mf" "$WORK/plates/Monorail - $name.3mf" > /dev/null 2>&1)
   python3 -I "$HERE/inject_paint.py" "$WORK/plates/Monorail - $name.3mf" "$WORK/proj/proj.3mf" \
       "$OUT/Monorail - $name.3mf" "$cols" "$SETTINGS" > /dev/null
+  if [[ "$name" == "car plate" ]]; then
+    python3 -I "$HERE/fine_layers.py" "$OUT/Monorail - $name.3mf" $NOSE_FROM $NOSE_LAYER $TOWER_X $TOWER_Y > /dev/null
+  fi
   D="$WORK/slice_${name// /_}"; mkdir -p "$D"
   (cd "$D" && "$B" --slice 0 --outputdir "$D" "$OUT/Monorail - $name.3mf" > cli.log 2>&1)
   python3 - "$D/result.json" "$name" <<'PY'
