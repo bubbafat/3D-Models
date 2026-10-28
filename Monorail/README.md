@@ -8,7 +8,7 @@
 replace them.*
 
 A Disney monorail desk countdown. Three 20 mm cubes in the window band show the
-days left, over **DAYS 'TIL DISNEY**; the other side reads **DISNEY IS
+days left, over **DAYS 'TIL VACATION**; the other side reads **VACATION IS
 CALLING!** for when no trip is booked yet. The fourth cube lives in a pocket in
 the tail. The car straddles a straight concrete-style beam on two pylons.
 
@@ -17,9 +17,10 @@ Python script, starting from an empty document. Nothing is modelled by hand.
 
 ## Build it
 
-1. Install the **Waltograph UI** font for all users (Font Book → *Install for:
-   All Users*), then restart Fusion — it reads its font list at launch. The
-   script tells you if it cannot find the font.
+1. Install this repository's two fonts, `CountdownDigits-Regular.ttf` and
+   `CountdownLettering-Regular.ttf` from [`Font/build`](../Font/build), with
+   Font Book, then restart Fusion — it reads its font list at launch. Without
+   them the script falls back to Waltograph UI, and its report says so.
 2. In Fusion, open a new, empty design.
 3. **Utilities → Add-ins → Scripts and Add-ins** (Shift+S) → **+** → *Create
    script*, Python. Open its folder and replace the generated `.py` with
@@ -77,7 +78,7 @@ plate. Otherwise, paint in the slicer.
 ## Printing
 
 Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers and
-PLA:
+PLA, before the switch to the Countdown fonts:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
@@ -112,14 +113,16 @@ to print them for a second set.
 Four cubes, not three, because the arithmetic demands it: to show every count
 from 000 to 365, the digits 0–3 each need three cubes (000, 111, 222, 333) and
 4–9 each need two (344, 355, 266, ...). That is 24 faces, which four cubes
-have exactly and three cannot — so no face is blank, and a small Mickey head
-under the 6 and the 9 tells them apart. The script re-proves all 366 counts
-every time it runs.
+have exactly and three cannot — so no face is blank. The digits are in
+[Countdown Digits](../Font), where the 9 is the 6 upside down: there is nothing
+to tell apart, since either face reads as a 6 one way up and a 9 the other.
+(`MARK_6_AND_9` puts back the small Mickey head that used to mark them.) The
+script re-proves all 366 counts every time it runs.
 
 ## Changing it
 
 The settings are at the top of the script: the lettering (`CAR_TEXT`), the
-fits (`cubeClearance`, `spareClearance`, `beamFit`, `pinFit`, `socketFit`),
+fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `beamFit`, `pinFit`, `socketFit`),
 `PREVIEW_COLOURS`, and `SPLIT_CAR` to build the car as one piece. Every layout
 rule is checked before anything is built, and again with measurements after:
 if a change makes two features collide, the script stops and says which, rather
@@ -127,5 +130,8 @@ than quietly building something that will not print.
 
 ## Status
 
-Built and checked in Fusion and in the slicer. The first, single-colour test
-print — for fit — is under way; nothing has been confirmed in plastic yet.
+Built and checked in Fusion and in the slicer. The first test print of the
+car came out well; a second, with the beam and foot, is under way. Since then
+the lettering and digits have moved to this repository's own
+[fonts](../Font) and the wording has changed; that version has not been
+printed yet.

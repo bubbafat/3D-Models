@@ -1,0 +1,533 @@
+{
+  "familyName": "Countdown Lettering",
+  "styleName": "Regular",
+  "version": "0.1",
+  "copyright": "",
+  "unitsPerEm": 1000,
+  "ascender": 900,
+  "descender": -260,
+  "figureHeight": 700,
+  "xHeight": 520,
+  "glyphDir": "glyphs-lettering",
+  "brush": {
+    "thick": 142,
+    "thin": 88,
+    "nibAngle": 20,
+    "swell": 0.06,
+    "step": 4
+  },
+  "simplify": 1.0,
+  "spacing": {
+    "target": 52,
+    "depth": 120,
+    "minSide": 40
+  },
+  "spaceWidth": 220,
+  "kerning": {
+    "minGap": 80,
+    "strength": 0.5,
+    "maxKern": 120,
+    "threshold": 10
+  },
+  "specimen": {
+    "alphabet": [
+      "ABCDEFGHIJKLM",
+      "NOPQRSTUVWXYZ",
+      "abcdefghijklm",
+      "nopqrstuvwxyz",
+      "0123456789 '!?.,-:"
+    ],
+    "bands": [
+      {
+        "label": "Monorail car, display side: 88 x 9 mm band",
+        "run": 88,
+        "height": 9,
+        "phrases": [
+          "DAYS 'TIL VACATION",
+          "VACATION IS CALLING!"
+        ],
+        "ground": "#c12e1f",
+        "ink": "#e2b33c"
+      },
+      {
+        "label": "Monorail car, other side",
+        "run": 88,
+        "height": 9,
+        "phrases": [
+          "VACATION IS CALLING!",
+          "DAYS 'TIL VACATION"
+        ],
+        "ground": "#c12e1f",
+        "ink": "#e2b33c"
+      },
+      {
+        "label": "Cruise ship hull, display side: 88.2 x 16 mm band",
+        "run": 88.2,
+        "height": 16,
+        "phrases": [
+          "Days 'Til We Sail",
+          "Let's Book a Cruise!"
+        ],
+        "ground": "#161616",
+        "ink": "#f2c21b"
+      },
+      {
+        "label": "Cruise ship hull, other side",
+        "run": 88.2,
+        "height": 16,
+        "phrases": [
+          "Let's Book a Cruise!",
+          "Days 'Til We Sail"
+        ],
+        "ground": "#161616",
+        "ink": "#f2c21b"
+      }
+    ]
+  },
+  "glyphs": {
+    "A": {
+      "name": "A",
+      "file": "A_",
+      "zone": "cap",
+      "tilt": -3
+    },
+    "B": {
+      "name": "B",
+      "file": "B_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "C": {
+      "name": "C",
+      "file": "C_",
+      "zone": "cap",
+      "tilt": -1
+    },
+    "D": {
+      "name": "D",
+      "file": "D_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "E": {
+      "name": "E",
+      "file": "E_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "F": {
+      "name": "F",
+      "file": "F_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "G": {
+      "name": "G",
+      "file": "G_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "H": {
+      "name": "H",
+      "file": "H_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "I": {
+      "name": "I",
+      "file": "I_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "J": {
+      "name": "J",
+      "file": "J_",
+      "zone": "cap",
+      "tilt": -1
+    },
+    "K": {
+      "name": "K",
+      "file": "K_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "L": {
+      "name": "L",
+      "file": "L_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "M": {
+      "name": "M",
+      "file": "M_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "N": {
+      "name": "N",
+      "file": "N_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "O": {
+      "name": "O",
+      "file": "O_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "P": {
+      "name": "P",
+      "file": "P_",
+      "zone": "cap",
+      "tilt": -1
+    },
+    "Q": {
+      "name": "Q",
+      "file": "Q_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "R": {
+      "name": "R",
+      "file": "R_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "S": {
+      "name": "S",
+      "file": "S_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "T": {
+      "name": "T",
+      "file": "T_",
+      "zone": "cap",
+      "tilt": 2
+    },
+    "U": {
+      "name": "U",
+      "file": "U_",
+      "zone": "cap",
+      "tilt": -1
+    },
+    "V": {
+      "name": "V",
+      "file": "V_",
+      "zone": "cap",
+      "tilt": 3
+    },
+    "W": {
+      "name": "W",
+      "file": "W_",
+      "zone": "cap",
+      "tilt": -1
+    },
+    "X": {
+      "name": "X",
+      "file": "X_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "Y": {
+      "name": "Y",
+      "file": "Y_",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "Z": {
+      "name": "Z",
+      "file": "Z_",
+      "zone": "cap",
+      "tilt": 1
+    },
+    "a": {
+      "name": "a",
+      "file": "a",
+      "zone": "x",
+      "tilt": 1
+    },
+    "b": {
+      "name": "b",
+      "file": "b",
+      "zone": "x",
+      "tilt": -1
+    },
+    "c": {
+      "name": "c",
+      "file": "c",
+      "zone": "x",
+      "tilt": 2
+    },
+    "d": {
+      "name": "d",
+      "file": "d",
+      "zone": "x",
+      "tilt": -2
+    },
+    "e": {
+      "name": "e",
+      "file": "e",
+      "zone": "x",
+      "tilt": 2
+    },
+    "f": {
+      "name": "f",
+      "file": "f",
+      "zone": "x",
+      "tilt": -1
+    },
+    "g": {
+      "name": "g",
+      "file": "g",
+      "zone": "x",
+      "tilt": 2
+    },
+    "h": {
+      "name": "h",
+      "file": "h",
+      "zone": "x",
+      "tilt": -1
+    },
+    "i": {
+      "name": "i",
+      "file": "i",
+      "zone": "x",
+      "tilt": 1
+    },
+    "j": {
+      "name": "j",
+      "file": "j",
+      "zone": "x",
+      "tilt": -2
+    },
+    "k": {
+      "name": "k",
+      "file": "k",
+      "zone": "x",
+      "tilt": 1
+    },
+    "l": {
+      "name": "l",
+      "file": "l",
+      "zone": "x",
+      "tilt": -1
+    },
+    "m": {
+      "name": "m",
+      "file": "m",
+      "zone": "x",
+      "tilt": 2
+    },
+    "n": {
+      "name": "n",
+      "file": "n",
+      "zone": "x",
+      "tilt": -1
+    },
+    "o": {
+      "name": "o",
+      "file": "o",
+      "zone": "x",
+      "tilt": 1
+    },
+    "p": {
+      "name": "p",
+      "file": "p",
+      "zone": "x",
+      "tilt": -2
+    },
+    "q": {
+      "name": "q",
+      "file": "q",
+      "zone": "x",
+      "tilt": 1
+    },
+    "r": {
+      "name": "r",
+      "file": "r",
+      "zone": "x",
+      "tilt": -1
+    },
+    "s": {
+      "name": "s",
+      "file": "s",
+      "zone": "x",
+      "tilt": 3
+    },
+    "t": {
+      "name": "t",
+      "file": "t",
+      "zone": "x",
+      "tilt": -1
+    },
+    "u": {
+      "name": "u",
+      "file": "u",
+      "zone": "x",
+      "tilt": 1
+    },
+    "v": {
+      "name": "v",
+      "file": "v",
+      "zone": "x",
+      "tilt": -2
+    },
+    "w": {
+      "name": "w",
+      "file": "w",
+      "zone": "x",
+      "tilt": 1
+    },
+    "x": {
+      "name": "x",
+      "file": "x",
+      "zone": "x",
+      "tilt": -1
+    },
+    "y": {
+      "name": "y",
+      "file": "y",
+      "zone": "x",
+      "tilt": 2
+    },
+    "z": {
+      "name": "z",
+      "file": "z",
+      "zone": "x",
+      "tilt": -1
+    },
+    "'": {
+      "name": "quotesingle",
+      "file": "quotesingle",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        40,
+        40
+      ],
+      "also": [
+        "’"
+      ]
+    },
+    "!": {
+      "name": "exclam",
+      "file": "exclam",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        50,
+        50
+      ]
+    },
+    ".": {
+      "name": "period",
+      "file": "period",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        50,
+        50
+      ]
+    },
+    ",": {
+      "name": "comma",
+      "file": "comma",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        40,
+        50
+      ]
+    },
+    "?": {
+      "name": "question",
+      "file": "question",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        40,
+        40
+      ]
+    },
+    "-": {
+      "name": "hyphen",
+      "file": "hyphen",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        40,
+        40
+      ]
+    },
+    ":": {
+      "name": "colon",
+      "file": "colon",
+      "zone": "cap",
+      "tilt": 0,
+      "sides": [
+        50,
+        50
+      ]
+    },
+    "0": {
+      "name": "zero",
+      "src": "glyphs/zero.svg",
+      "zone": "cap",
+      "tilt": -6
+    },
+    "1": {
+      "name": "one",
+      "src": "glyphs/one.svg",
+      "zone": "cap",
+      "tilt": 4
+    },
+    "2": {
+      "name": "two",
+      "src": "glyphs/two.svg",
+      "zone": "cap",
+      "tilt": -3
+    },
+    "3": {
+      "name": "three",
+      "src": "glyphs/three.svg",
+      "zone": "cap",
+      "tilt": 3
+    },
+    "4": {
+      "name": "four",
+      "src": "glyphs/four.svg",
+      "zone": "cap",
+      "tilt": -4
+    },
+    "5": {
+      "name": "five",
+      "src": "glyphs/five.svg",
+      "zone": "cap",
+      "tilt": 3
+    },
+    "6": {
+      "name": "six",
+      "src": "glyphs/six.svg",
+      "zone": "cap",
+      "tilt": -5
+    },
+    "7": {
+      "name": "seven",
+      "src": "glyphs/seven.svg",
+      "zone": "cap",
+      "tilt": 3
+    },
+    "8": {
+      "name": "eight",
+      "src": "glyphs/eight.svg",
+      "zone": "cap",
+      "tilt": -2
+    },
+    "9": {
+      "name": "nine",
+      "rotate180Of": "6",
+      "zone": "cap"
+    }
+  }
+}

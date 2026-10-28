@@ -1,0 +1,61 @@
+{
+  "familyName": "Countdown Digits",
+  "styleName": "Regular",
+  "version": "0.1",
+  "copyright": "",
+  "unitsPerEm": 1000,
+  "ascender": 800,
+  "descender": -200,
+  "figureHeight": 700,
+  "defaultAdvance": 580,
+  "brush": {
+    "thick": 135,
+    "thin": 70,
+    "nibAngle": 20,
+    "swell": 0.06,
+    "step": 4
+  },
+  "simplify": 1.0,
+  "glyphs": {
+    "0": {
+      "name": "zero",
+      "tilt": -6
+    },
+    "1": {
+      "name": "one",
+      "tilt": 4
+    },
+    "2": {
+      "name": "two",
+      "tilt": -3
+    },
+    "3": {
+      "name": "three",
+      "tilt": 3
+    },
+    "4": {
+      "name": "four",
+      "tilt": -4
+    },
+    "5": {
+      "name": "five",
+      "tilt": 3
+    },
+    "6": {
+      "name": "six",
+      "tilt": -5
+    },
+    "7": {
+      "name": "seven",
+      "tilt": 3
+    },
+    "8": {
+      "name": "eight",
+      "tilt": -2
+    },
+    "9": {
+      "name": "nine",
+      "rotate180Of": "6"
+    }
+  }
+}

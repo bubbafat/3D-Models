@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 1000" width="290" height="500">
+  <!-- The pen lines for "eight", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       font.json; each circle is a ball terminal. Only what is inside the
+       group is used; the grey lines are guides (baseline and figure height). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="0" y1="800" x2="580" y2="800"/>
+    <line x1="0" y1="100" x2="580" y2="100"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 380 612 C 350 645 312 652 286 650 C 220 648 172 600 172 534 C 172 450 250 412 290 380 C 360 330 452 300 452 206 C 452 108 374 46 290 46 C 196 46 128 110 128 200 C 128 290 220 330 290 372 C 340 404 410 450 410 526 C 410 568 398 592 380 612 Z"/>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 0 800 1100" width="400" height="550">
+  <!-- The pen lines for "M", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       lettering.json; each circle is a ball terminal. Only what is inside
+       the group is used; the grey lines are guides (descender, baseline,
+       x-height, cap height, ascender). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="-100" y1="970" x2="700" y2="970"/>
+    <line x1="-100" y1="800" x2="700" y2="800"/>
+    <line x1="-100" y1="280" x2="700" y2="280"/>
+    <line x1="-100" y1="100" x2="700" y2="100"/>
+    <line x1="-100" y1="60" x2="700" y2="60"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 70 46 C 74 300 80 520 96 630 C 102 666 132 666 142 632 C 182 520 226 400 250 340 C 274 400 318 520 358 632 C 368 666 398 666 404 630 C 420 520 426 300 430 46"/>
+  </g>
+</svg>

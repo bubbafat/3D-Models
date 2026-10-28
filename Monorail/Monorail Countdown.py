@@ -328,31 +328,36 @@ def run(context):
                 'radius. They need real overlap or they read as three loose blobs.'
                 .format(earOffset, (mickHead + mickEar) / 2.0))
 
+        # ------------------------------------------------------------- fonts
+        # Fusion matches the family name exactly and rejects anything else. Each
+        # list is tried in turn and the report says which name was used. The
+        # Countdown fonts are this repository's own, built in Font/; Waltograph,
+        # in its various spellings, is the fallback.
+        WALTOGRAPH = ['Waltograph UI', 'Waltograph', 'waltograph UI', 'WaltographUI',
+                      'Waltograph 42', 'Waltograph42']
+        DIGIT_FONTS = ['Countdown Digits'] + WALTOGRAPH
+        TEXT_FONTS = ['Countdown Lettering'] + WALTOGRAPH
+
         # ----------------------------------------------------- digit engraving
-        # Fusion matches the family name exactly and rejects anything else, and
-        # the spelling varies between Waltograph releases. Put your preferred
-        # name first; the resolver tries each in turn and reports what it used.
-        FONT_NAME = 'Waltograph UI'
-        FONT_ALTERNATES = ['Waltograph', 'waltograph UI', 'WaltographUI',
-                           'Waltograph 42', 'Waltograph42']
-        FONT_IN_USE = [FONT_NAME]     # set by resolve_font before anything is built
         digitRecess = 0.84            # 2 outer walls at 0.42 -- 0.6 is 1.43 walls,
                                       # which Arachne resolves differently layer to
                                       # layer and prints ragged
         digitInkHeight = 11.0         # visible glyph height -- calibrated, not guessed
         digitEmSeed = 15.0            # starting em size for the calibration pass
-        digitBold = False             # Waltograph has no real bold weight
+        digitBold = False             # neither digit font has a real bold weight
         digitShiftMark = 2.0          # lift the digit on faces that carry the mark
         digitMarkGap = 0.8            # clear space demanded between digit and mark
         toolOvershoot = 0.5           # how far the cut tool pokes past the face
 
-        MARK_6_AND_9 = True           # Mickey doubles as the 6/9 orientation mark
+        MARK_6_AND_9 = False          # Mickey doubles as the 6/9 orientation mark.
+                                      # Off: Countdown Digits' 9 is its 6 upside
+                                      # down, so the two need not be told apart
         markScale = 0.45
         markCentreY = -6.6            # below the face centre
 
         # ------------------------------------------------------ car lettering
-        CAR_TEXT = {'D': "DAYS 'TIL DISNEY",
-                    'B': "DISNEY IS CALLING!"}
+        CAR_TEXT = {'D': "DAYS 'TIL VACATION",
+                    'B': "VACATION IS CALLING!"}
         textSides = ('D', 'B')        # D is the display side (+y), B the back
         textSharedScale = True
         textRise = 1.2                # above the stripe floor; 0.4 proud of the flank
@@ -905,7 +910,7 @@ def run(context):
             return extrude_symmetric(sk, 2.0 * halfSpan, bodyName or ('Tool_' + name))
 
         # ------------------------------------------------------- text machinery
-        def text_tool(sketchName, text, emHeight, depth):
+        def text_tool(sketchName, text, emHeight, depth, font):
             """Text prism standing on the world XY plane.
 
             Fusion's MiddleVerticalAlignment anchors a single line near the
@@ -917,8 +922,8 @@ def run(context):
             boxW = emHeight * len(text) * 1.6 + 10.0
             boxH = emHeight * 3.0
             inp = sk.sketchTexts.createInput2(text, mm(emHeight))
-            inp.fontName = FONT_IN_USE[0]
-            if digitBold:
+            inp.fontName = font
+            if digitBold and font == digitFont:
                 inp.textStyle = adsk.fusion.TextStyles.TextStyleBold
             inp.setAsMultiLine(
                 P(-boxW / 2.0, -boxH / 2.0), P(boxW / 2.0, boxH / 2.0),
@@ -930,8 +935,7 @@ def run(context):
             except:
                 raise RuntimeError(
                     'Fusion would not create text in the font "{}", although the '
-                    'resolver accepted that name earlier in this run.'
-                    .format(FONT_IN_USE[0]))
+                    'resolver accepted that name earlier in this run.'.format(font))
             op = adsk.fusion.FeatureOperations.NewBodyFeatureOperation
             try:
                 ei = extrudes.createInput(txt, op)
@@ -944,7 +948,7 @@ def run(context):
             feat = extrudes.add(ei)
             require(feat.bodies.count > 0,
                     'Text "{}" produced no solid -- the glyph outlines in "{}" are '
-                    'probably self-intersecting.'.format(text, FONT_IN_USE[0]))
+                    'probably self-intersecting.'.format(text, font))
             return label_tool_bodies(feat), sk
 
         def font_files_on_disk(needle):
@@ -963,47 +967,49 @@ def run(context):
                     pass
             return hits
 
-        def resolve_font():
-            """Find a family name Fusion will actually accept, before a thousand
-            features depend on it. Fusion raises on add(), not on setting
-            fontName, so the only honest test is to create one and throw it away."""
+        def resolve_font(candidates, sample, what):
+            """The first family name Fusion will actually build text in, found
+            before a thousand features depend on it. Fusion raises on add(), not
+            on setting fontName, so the only honest test is to create some and
+            throw it away."""
             tried = []
-            for name in [FONT_NAME] + FONT_ALTERNATES:
+            for name in candidates:
                 if name in tried:
                     continue
                 tried.append(name)
                 sk = root.sketches.add(root.xYConstructionPlane)
                 sk.name = 'Probe_Font'
                 try:
-                    inp = sk.sketchTexts.createInput2('0', mm(10.0))
+                    inp = sk.sketchTexts.createInput2(sample, mm(10.0))
                     inp.fontName = name
                     inp.setAsMultiLine(
-                        P(-20.0, -20.0), P(20.0, 20.0),
+                        P(-40.0, -20.0), P(40.0, 20.0),
                         adsk.core.HorizontalAlignments.CenterHorizontalAlignment,
                         adsk.core.VerticalAlignments.MiddleVerticalAlignment, 0.0)
                     sk.sketchTexts.add(inp)
                     sk.deleteMe()
-                    FONT_IN_USE[0] = name
                     return name
                 except:
                     try:
                         sk.deleteMe()
                     except:
                         pass
-            found = font_files_on_disk('walto')
+            found = font_files_on_disk('countdown') + font_files_on_disk('walto')
             raise RuntimeError(
-                'Fusion rejected every font name tried: {}.\n\n'
+                'Fusion rejected every font name tried for the {}: {}.\n\n'
                 'Matching font files on this machine:\n  {}\n\n'
                 'Open Sketch > Create > Text in Fusion and read the exact family '
-                'name out of the Font dropdown, then set FONT_NAME to it. If it is '
-                'not in that dropdown at all, Fusion cannot see the font: '
-                'reinstall it in Font Book with "Install for: All Users", then '
-                'restart Fusion -- the font list is only read at launch.'
-                .format(', '.join('"{}"'.format(t) for t in tried),
+                'name out of the Font dropdown, then put it first in the list. If it '
+                'is not in that dropdown at all, Fusion cannot see the font: install '
+                'the TrueType (.ttf) file in Font Book -- Fusion refuses '
+                'OpenType-PostScript (.otf) fonts -- then restart Fusion, which '
+                'reads its font list only at launch.'
+                .format(what, ', '.join('"{}"'.format(t) for t in tried),
                         '\n  '.join(found) if found else
                         '(none found -- the font is not installed)'))
 
-        fontInUse = resolve_font()
+        digitFont = resolve_font(DIGIT_FONTS, '0', 'cube digits')
+        textFont = resolve_font(TEXT_FONTS, 'D', 'car lettering')
 
         # ============================================================== the car
         def rounded_rect(sk, to_local, halfW, z0, z1, rB, rT):
@@ -1343,7 +1349,7 @@ def run(context):
         seedSize = {}
         for sideTag in textSides:
             f, sk = text_tool('Text_Fit_{}'.format(sideTag),
-                              CAR_TEXT[sideTag], textSeedEm, 1.0)
+                              CAR_TEXT[sideTag], textSeedEm, 1.0, textFont)
             lo, hi = bodies_extent([f])
             seedSize[sideTag] = (hi[0] - lo[0], hi[1] - lo[1])
             drop(f, 'lettering fit extrude for side ' + sideTag)
@@ -1369,7 +1375,7 @@ def run(context):
             sideSign = 1.0 if sideTag == 'D' else -1.0
 
             feat, _ = text_tool('Text_{}'.format(sideTag),
-                                CAR_TEXT[sideTag], textEm[sideTag], textThick)
+                                CAR_TEXT[sideTag], textEm[sideTag], textThick, textFont)
             require(feat.bodies.count >= textMinGlyphs,
                     'The lettering on side {} came out as {} solid(s). A script that '
                     'joins into one piece gives the fit nothing to measure.'
@@ -1606,7 +1612,7 @@ def run(context):
         # assuming some fraction of the em size -- a script face like Waltograph
         # has nothing like text-face metrics.
         calFeat, calSk = text_tool('Cube_Digit_Calibration', '0123456789',
-                                   digitEmSeed, cubeToolHeight)
+                                   digitEmSeed, cubeToolHeight, digitFont)
         calLo, calHi = bodies_extent([calFeat])
         calH = calHi[1] - calLo[1]
         calW = calHi[0] - calLo[0]
@@ -1646,7 +1652,7 @@ def run(context):
         def engrave_face(bodyName, centre, faceKey, digit, withMark):
             anchorY = digitShiftMark if withMark else 0.0
             toolFeats = [text_tool('Cube_Digit_{}_{}'.format(bodyName, faceKey),
-                                   digit, digitEmHeight, cubeToolHeight)[0]]
+                                   digit, digitEmHeight, cubeToolHeight, digitFont)[0]]
 
             # Centre on the ink, not on the text box.
             lo, hi = bodies_extent(toolFeats)
@@ -1864,7 +1870,7 @@ def run(context):
                       'notched {:.0f} mm each side.\n'
                       'Livery as real steps, not split faces: band {:.1f} mm, windshield '
                       '{:.1f} mm, stripe {:.1f} mm; tools came apart into {}/{}/{} pieces.\n\n'
-                      'Font resolved to "{}"{}.\n'
+                      'Fonts: digits in "{}"{}, lettering in "{}"{}.\n'
                       'Digits: 24 faces, recessed {:.2f} mm ({:.1f} walls at 0.42).\n'
                       'Calibrated to a {:.1f} mm em; measured ink {:.1f}-{:.1f} mm tall, '
                       'widest {:.1f} mm, centred on the ink.\n'
@@ -1894,9 +1900,12 @@ def run(context):
                               spareClearance, spareZ0, spareZ1, spareGripDia,
                               bandDepth, glassDepth, stripeDepth,
                               bandPieces, glassPieces, stripePieces,
-                              fontInUse,
-                              '' if fontInUse == FONT_NAME
-                              else ' (NOT your first choice, "{}")'.format(FONT_NAME),
+                              digitFont,
+                              '' if digitFont == DIGIT_FONTS[0]
+                              else ' (NOT your first choice, "{}")'.format(DIGIT_FONTS[0]),
+                              textFont,
+                              '' if textFont == TEXT_FONTS[0]
+                              else ' (NOT your first choice, "{}")'.format(TEXT_FONTS[0]),
                               digitRecess, digitRecess / 0.42,
                               digitEmHeight, inkHiMin, inkHiMax, inkWidest,
                               ', '.join(marked) if marked else 'off',

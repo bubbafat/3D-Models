@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 1000" width="290" height="500">
+  <!-- The pen lines for "five", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       font.json; each circle is a ball terminal. Only what is inside the
+       group is used; the grey lines are guides (baseline and figure height). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="0" y1="800" x2="580" y2="800"/>
+    <line x1="0" y1="100" x2="580" y2="100"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 198 648 C 192 580 182 506 174 446 C 170 424 186 418 206 430 C 266 470 350 480 412 440 C 484 394 500 296 484 204 C 466 94 378 44 278 44 C 180 44 110 100 110 176 C 110 210 120 232 140 246"/>
+    <path d="M 166 644 C 248 660 344 634 424 646 C 446 650 462 658 472 674"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 1000" width="290" height="500">
+  <!-- The pen lines for "one", in font units with y up: the group below
+       flips them for display. Each path is one stroke of the brush in
+       font.json; each circle is a ball terminal. Only what is inside the
+       group is used; the grey lines are guides (baseline and figure height). -->
+  <g stroke="#bbb" stroke-width="2">
+    <line x1="0" y1="800" x2="580" y2="800"/>
+    <line x1="0" y1="100" x2="580" y2="100"/>
+  </g>
+  <g transform="matrix(1 0 0 -1 0 800)" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round">
+    <path d="M 130 470 C 196 520 258 600 292 650 C 304 666 328 668 330 636 C 334 520 334 380 322 250 C 312 160 314 100 310 58"/>
+    <path d="M 176 52 C 240 72 360 38 446 60"/>
+    <circle cx="124" cy="466" r="66" fill="#000"/>
+  </g>
+</svg>
