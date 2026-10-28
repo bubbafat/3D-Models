@@ -78,13 +78,13 @@ plate. Otherwise, paint in the slicer.
 ## Printing
 
 Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers and
-PLA, before the switch to the Countdown fonts:
+PLA:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
 | Car halves and pins | 11.1 h | 217 | ~200 g |
 | Beam and foot | 1.1 h | 0 | 37 g |
-| Cubes (optional) | 4.6 h | 94 | 75 g |
+| Cubes (optional) | 3.7 h | 70 | 62 g |
 
 The car plate's changes come from the nose: lying flat, it stands upright, so
 its windshield and red lip put three colours in almost every layer. With the

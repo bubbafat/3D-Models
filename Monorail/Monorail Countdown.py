@@ -186,7 +186,7 @@ def run(context):
         set_param('slotDepth', '16 mm', 'mm', 'Display slot depth from the frame face -- cube stands cubeSize minus this proud')
         set_param('frameProud', '1.5 mm', 'mm', 'How far the black cube frames stand off the flank')
         set_param('cubeEdgeFillet', '1 mm', 'mm', 'Cube edge break')
-        set_param('spareClearance', '1.2 mm', 'mm', 'Spare pocket slack, total across the cube')
+        set_param('spareClearance', '1.7 mm', 'mm', 'Spare pocket slack, total across the cube')
         set_param('stripeDepth', '0.8 mm', 'mm', 'Red stripe recess -- 2 walls at 0.42')
         set_param('bandDepth', '0.6 mm', 'mm', 'Black window band recess')
         set_param('glassDepth', '1.2 mm', 'mm', 'Windshield glass recess, a further step inside the band')
@@ -303,11 +303,15 @@ def run(context):
         slotFloorY = frameFaceY - slotDepth
         cubeProud = cube - slotDepth  # beyond the frame face
 
-        spareClearance = 1.2          # total, so 0.6 a side -- a deep pocket's walls
-                                      # bow in further, and 0.6 total seized on the ship
-        spareDepth = cube + spareClearance
+        spareClearance = 1.7          # total, so 0.85 a side. 1.2 printed snug: lying
+                                      # on the split face, each half prints the
+                                      # pocket's side wall as a supported roof, whose
+                                      # support scars likely ate the slack. 0.6 total
+                                      # seized on the ship
+        spareDepth = cube + 1.2       # the cube sits 1.2 mm in from the tail face
         sparePocketSize = cube + spareClearance
-        spareZ0 = 13.0                # in the tail face, under the coupler
+        spareZ0 = 12.75               # in the tail face, under the coupler; the
+                                      # pocket's centre stays at z 23.6
         spareZ1 = spareZ0 + sparePocketSize
         spareCentreZ = (spareZ0 + spareZ1) / 2.0
         spareGripDia = 6.0            # finger notch in each pocket side wall

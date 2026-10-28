@@ -15,7 +15,7 @@ export keeps the model's colours, but Bambu Studio ignores them.
 
 - **macOS.** The script uses the macOS paths to Fusion and Bambu Studio.
 - **Fusion** with the [ClaudeBridge](../../ClaudeBridge) add-in running, and
-  the Waltograph UI font the model needs. If the add-in is not installed in
+  the two [Countdown fonts](../../Font) the model needs. If the add-in is not installed in
   Fusion's add-ins folder, set `CLAUDEBRIDGE` to the folder it is in.
 - **Bambu Studio** in `/Applications`. Tested with 2.07 and a P1S; the plates
   are laid out for a 256 mm bed.
