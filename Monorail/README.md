@@ -36,24 +36,38 @@ python3 send.py run "/path/to/Monorail Countdown.py"
 
 ## What it makes
 
-Eleven bodies, 176.6 × 56 × 76 mm assembled.
+Fourteen bodies, 176.6 × 56 × 76 mm assembled.
+
+![The car's four parts, pulled apart](render-parts.png)
 
 | Body | What it is | Print it |
 |---|---|---|
-| `Car_Display` | The half of the car with the cube slots | Flat on its split face |
-| `Car_Back` | The other half | Flat on its split face |
-| `Pin_1`–`Pin_3` | Loose pins that line the halves up for gluing | Standing on end |
+| `Car_Bottom` | The white belly, up to the red stripe | Belly down |
+| `Car_Red_Display` | The display half of the red stripe, with the lettering | On its cut face |
+| `Car_Red_Back` | The back half of the red stripe | On its cut face |
+| `Car_Top` | White, the black band and frames, white roof, with the cube slots | Standing on its flat bottom |
+| `Pin_1`–`Pin_4` | Loose pins that locate the top on the red | Standing on end |
 | `Beam` | The beam and both pylons, one piece | On its side |
 | `Foot` | The plate the pylons plug into | Flat |
 | `Cube_1`–`Cube_3` | The countdown cubes | A digit face down |
 | `Cube_4_Spare` | The fourth cube, kept in the tail | A digit face down |
 
-The car is split down the middle so each half lies flat on its cut face: the
-cube slots open upward, the lettering is on the top surface, and nothing
-needs support. The beam's top is a ridge that seats in a V in the belly, so the
-belly has no ledge to overhang. The spare pocket's roof is a bridge, and its
-finger notches are cut in its top and bottom walls, which stand upright in
-print.
+The car is cut where its colours meet, like the ship's hull and
+superstructure, so each part prints in one colour or close to it:
+
+- **The bottom** is all white. Printed belly down, the beam channel is a
+  bridge; the nose's underside, which curves up off the bed, is supported.
+- **The red stripe** is cut down the middle. Each half lies on its cut face, so
+  the gold lettering, which stands on the red, is only the last few layers.
+- **The top** prints standing up, so the black band, frames and windshield are
+  upright walls, and the cube slots and the spare pocket's roof are bridges.
+  The coupler's underside slopes at 45° so it needs no support.
+
+The red stripe is set 0.8 mm into the body, so the bottom's top face has a
+ledge round it, as the ship's deck does round its superstructure. Like the
+ship, it carries a 0.4 mm locating recess, with 0.1 mm clearance a side, that
+both red halves stand in. The top overhangs the red, so instead four pins
+locate it, in sockets in both.
 
 ## Colours
 
@@ -80,40 +94,55 @@ plate. Otherwise, paint in the slicer.
 
 ## Printing
 
-Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers and
-PLA, 8% lightning infill, no supports, and 0.08 mm layers on the car's nose:
+Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers,
+PLA and 8% lightning infill. One car:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car halves and pins | 13.9 h | 298 | ~204 g |
-| Beam and foot | 0.9 h | 0 | 29 g |
+| Car bottom and pins | 1.1 h | 0 | 26 g |
+| Car red halves | 1.1 h | 1 | 30 g |
+| Car top | 5.9 h | 122 | 114 g |
+| Beam and foot | 0.9 h | 0 | 30 g |
 | Cubes (optional) | 3.6 h | 70 | 60 g |
 
-The car plate's changes come from the nose: lying flat, it stands upright, so
-its windshield and red lip put three colours in almost every layer. With the
-nose and tail plain white it would be about 7.4 h.
+The red plate changes colour once: the red ends at the stripe's floor and the
+letters stand on it, so everything above is gold. The top's changes come from
+the black band and frames, which are in every layer from its bottom to 24 mm
+up. The changes are paid per layer, not per part, so batches share them. Per
+car, measured on full plates:
 
-**The nose's layers.** Each half lies on its split face, so near the top of the
-half the nose curves away from the flank as a shallow slope. There, 0.2 mm
-layers print as steps up to 2 mm wide, and they showed on the first test print.
-From 16 mm up the car plate uses 0.08 mm layers instead. Test pieces at 0.2,
-0.12 and 0.08 mm all printed acceptably, but 0.08 mm looked and felt the best.
-It costs about 40 g of filament and 4.5 h per car plate, almost all of it in
-extra colour changes, since every colour on the car meets in that band.
+| Batch | Per car |
+|---|---|
+| 4 bottoms a plate | 1.0 h, 26 g |
+| 5 pairs of red halves a plate | about 0.9 h, 27 g |
+| 4 tops a plate | 2.4 h, 61 g, about 31 changes |
 
-**No supports.** Every face that looks down in print slopes at 40° or
-steeper, apart from a few short flat spans that print fine unsupported: the
-pin sockets' ends, the tail lights' 2 mm undersides, and the spare pocket's
-roof. The roof is a 21.7 mm bridge held on three sides, like the ship's
-transom pocket. The pocket's finger notches used to be in its side walls.
-Lying on the split face, those walls are the roof, so the notches were holes
-in the bridge, and they fell apart on a test print. They are now in the top
-and bottom walls, rounded where the finger goes, with 45° flanks.
+That is about 4.3 h and 114 g a car. The earlier car, in two halves, took
+9.8 h and 168 g printed one to a plate; it was not measured in batches. The
+five pairs of red halves were sliced without supports, which add about 1 g
+and 5 minutes a pair.
 
-**Assembly.** Push the pins into one half's sockets, glue the halves together,
-and glue the pylons into the foot. The car lifts on and off the beam. Its V seats
-on the beam's ridge, and a bump on the ridge drops into a notch in the V, so
-it always sits centred.
+**Supports.** The bottom is supported under the nose, and each red half under
+its tail end, which overhangs the spare pocket. Nothing else is: the beam
+channel, the cube slots and the pocket's roof are bridges, which print fine,
+and support inside them would be hard to clear out. Bambu's own supports
+filled those too, so the print files have supports painted on where they are
+wanted, and Bambu supports nothing else. The supports are in the part's own
+filament. A PETG interface on the bottom cost 58 filament changes, because the
+nose's underside meets its supports at almost every height.
+
+**The nose.** The red halves still print on their cut faces, so their nose
+curves away from the flank near the top of the print. The nose's width narrows
+on a gentler curve than its height, so it leaves the flank more steeply: at
+0.2 mm layers the first steps there are 1.9, 1.5 and 1.3 mm wide, where they
+were 7.1, 2.3 and 1.8 mm. The top prints standing up, so its nose is an
+upright wall.
+
+**Assembly.** Stand the red halves in the bottom's recess and glue them in and
+to each other, push the pins into the red halves' sockets, then glue the top
+on. Glue the pylons into the foot. The car lifts on and off the beam: the
+beam's flat top runs in a channel in the belly, and a bump on the beam drops
+into a notch in the channel, so the car always sits centred.
 
 ## The cubes
 
@@ -140,7 +169,7 @@ script re-proves all 366 counts every time it runs.
 ## Changing it
 
 The settings are at the top of the script: the lettering (`CAR_TEXT`), the
-fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `grooveFit`, `pinFit`, `socketFit`),
+fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `beamFit`, `seatGap`, `pinFit`, `socketFit`),
 `PREVIEW_COLOURS`, and `SPLIT_CAR` to build the car as one piece. Every layout
 rule is checked before anything is built, and again with measurements after:
 if a change makes two features collide, the script stops and says which, rather
@@ -148,8 +177,10 @@ than quietly building something that will not print.
 
 ## Status
 
-Built and checked in Fusion and in the slicer. The first test print of the
-car came out well; a second, with the beam and foot, is under way. Since then
-the lettering and digits have moved to this repository's own
-[fonts](../Font) and the wording has changed; that version has not been
-printed yet.
+Built and checked in Fusion and in the slicer. The car used to print in two
+halves, each on its cut face; test prints checked the cube fit, the beam and the
+spare pocket. The first one in full colour showed stepped layers where the nose
+leaves the flank, red flecks on the white there, and a white line down the
+nose where the halves met: each half's first layer takes the colour of its
+unpainted cut face. That led to cutting the car along its colours instead,
+which has not been printed yet.

@@ -15,8 +15,8 @@ with zipfile.ZipFile(mine) as z:
 my_objects = []
 for o in mroot.iter(C + 'object'):
     verts = [(float(v.get('x')), float(v.get('y')), float(v.get('z'))) for v in o.iter(C + 'vertex')]
-    tris = [(int(t.get('v1')), int(t.get('v2')), int(t.get('v3')), t.get('paint_color'))
-            for t in o.iter(C + 'triangle')]
+    tris = [(int(t.get('v1')), int(t.get('v2')), int(t.get('v3')), t.get('paint_color'),
+             t.get('paint_supports')) for t in o.iter(C + 'triangle')]
     my_objects.append((o.get('name'), verts, tris))
 
 zin = zipfile.ZipFile(bambu)
@@ -30,6 +30,7 @@ for o in main.iter(C + 'object'):
         part_path[comp.get('objectid')] = comp.get(P + 'path').lstrip('/')
 
 report = []
+any_support = False
 for obj in settings.findall('object'):
     for part in obj.findall('part'):
         meta = {m.get('key'): m.get('value') for m in part.findall('metadata')}
@@ -51,16 +52,19 @@ for obj in settings.findall('object'):
         # triangles would shift every later one onto the wrong paint.
         it = iter(tris)
         def add(m):
-            a, b, c, paint = next(it)
+            a, b, c, paint, support = next(it)
             assert (int(m.group(1)), int(m.group(2)), int(m.group(3))) == (a, b, c)
-            return '<triangle v1="{}" v2="{}" v3="{}"{}/>'.format(
-                a, b, c, ' paint_color="{}"'.format(paint) if paint else '')
+            return '<triangle v1="{}" v2="{}" v3="{}"{}{}/>'.format(
+                a, b, c, ' paint_color="{}"'.format(paint) if paint else '',
+                ' paint_supports="{}"'.format(support) if support else '')
         text, n = re.subn(r'<triangle v1="(\d+)" v2="(\d+)" v3="(\d+)"[^>]*/>', add, text)
         assert n == len(tris), '{}: rewrote {} of {} triangles'.format(name, n, len(tris))
         files[path] = text.encode()
         painted = sum(1 for t in tris if t[3])
-        report.append('  {:13s} {} triangles, {} painted, vertices within {:.5f} mm'.format(
-            name, len(tris), painted, worst))
+        supports = sum(1 for t in tris if t[4])
+        any_support = any_support or supports > 0
+        report.append('  {:13s} {} triangles, {} painted, {} to support, vertices within {:.5f} mm'
+                      .format(name, len(tris), painted, supports, worst))
 
 # Settings from a project you already print with: your printer, process and
 # four AMS filaments. The settings the Bambu command line loads for itself come
@@ -69,10 +73,17 @@ ps = json.loads(zipfile.ZipFile(borrowed).read('Metadata/project_settings.config
 have = len(ps.get('filament_settings_id', []))
 assert have >= len(colours), '{} has {} filaments; the paint needs {}'.format(borrowed, have, len(colours))
 ps['filament_colour'] = colours
-# Nothing in the monorail needs support: the V in the belly, the beam's ridge
-# and the spare pocket's finger notches all print at 40 degrees or steeper, and
-# the pocket's roof is a bridge. Supports would only add scars and a filament.
-ps['enable_support'] = '0'
+# Support exactly what to_bambu.py painted for support, and nothing else: tree
+# supports in manual mode, in the part's own filament, with the usual gap for
+# PLA on PLA. Bridges -- the beam channel, the cube slots, the pocket's roof --
+# print fine without, and support inside them would be hard to clear.
+if any_support:
+    ps.update({'enable_support': '1', 'support_type': 'tree(manual)',
+               'support_critical_regions_only': '0', 'support_on_build_plate_only': '1',
+               'support_top_z_distance': '0.2',
+               'support_filament': '0', 'support_interface_filament': '0'})
+else:
+    ps['enable_support'] = '0'
 files['Metadata/project_settings.config'] = json.dumps(ps, indent=4).encode()
 
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
