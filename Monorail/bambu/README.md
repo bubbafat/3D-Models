@@ -6,7 +6,7 @@ slicer:
 - painted in the model's four colours;
 - each part turned to its print orientation;
 - supports painted on exactly where they are needed;
-- laid out on five plates;
+- laid out on five plates, in one project;
 - sliced, with time, filament changes and grams reported.
 
 Without it you would paint every part by hand in Bambu Studio. Fusion's 3MF
@@ -43,26 +43,27 @@ Leave off the last one for supports without PETG.
 It takes about a minute, most of it Fusion building the model. It leaves a
 new document open in Fusion, built from
 `Monorail Countdown.py`. Close that document without saving; the script never
-closes any of your documents. The output folder gets five files. Every one has
-the same filaments, so a filament number means the same in each, and a part
-imported into another file's project keeps its colours: your four AMS
+closes any of your documents. The output folder gets `Monorail.3mf`, one
+project with all five plates, and each plate on its own as well. Every file
+has the same filaments, so a filament number means the same in each, and a
+part imported into another file's project keeps its colours: your four AMS
 filaments, 1 white, 2 black, 3 red, 4 gold, then 5 grey, a copy of your
-filament 1, and 6 PETG, if you gave a PETG project. Of those, each uses:
+filament 1, and 6 PETG, if you gave a PETG project. Of those, each plate uses:
 
-| File | Parts | Uses |
-|---|---|---|
-| `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 6 PETG |
-| `Monorail - car red.3mf` | The two red halves | 3 red, 4 gold, 6 PETG |
-| `Monorail - car top.3mf` | The car's top | 1 white, 2 black |
-| `Monorail - beam plate.3mf` | Beam and foot | 5 grey |
-| `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
+| Plate | On its own | Parts | Uses |
+|---|---|---|---|
+| 1 Car Bottom | `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 6 PETG |
+| 2 Car Red | `Monorail - car red.3mf` | The two red halves | 3 red, 4 gold, 6 PETG |
+| 3 Car Top | `Monorail - car top.3mf` | The car's top | 1 white, 2 black |
+| 4 Beam Plate | `Monorail - beam plate.3mf` | Beam and foot | 5 grey |
+| 5 Cubes | `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
 
-When you print a plate, map the filaments it uses to your AMS. Each file is
+When you print a plate, map the filaments it uses to your AMS. Each plate is
 one car. To print a batch, add copies of the part in Bambu Studio; the paint
 and supports copy with it.
 
-Each line it ends with is one plate's slice: filament changes, hours, minutes
-of flushing, and grams per filament.
+Each line it ends with is one plate of `Monorail.3mf`, sliced: filament
+changes, hours, minutes of flushing, and grams by filament.
 
 ## How it works
 
@@ -84,7 +85,8 @@ of flushing, and grams per filament.
    which supports the painted faces and nothing else; with the PETG, its
    interface is PETG, with no gap, and that plate stops flushing into the
    parts' infill, so no PETG ends up inside a PLA part.
-6. Bambu Studio's command line slices each finished project and reports.
+6. `one_project.py` merges the five into `Monorail.3mf`, and Bambu Studio's
+   command line slices it, every plate, and reports.
 
 ## What Bambu Studio does that you need to know
 
@@ -148,6 +150,15 @@ model. It was worked out by testing against Bambu Studio 2.07.
   to, and `filament_extruder_variant` which variant. Copying a filament from one
   project to another has to follow them, or it silently keeps the old values:
   PETG at PLA's 220 °C.
+- **A project with several plates.** Plates sit in a grid, as many columns as
+  the square root of the plate count rounded up, 307.2 mm apart (the bed and a
+  fifth). Each `<plate>` in `model_settings.config` lists its parts as
+  `<model_instance>`s, and `wipe_tower_x`/`wipe_tower_y` hold a place for each
+  plate. Every other setting is the project's, but an object can override some,
+  such as `flush_into_infill`, with its own `<metadata>`: that is how the PETG
+  plates keep their purge out of the infill while the top's goes into it.
+  Each single-plate project numbers its objects from 1, so merging means
+  renumbering them and their mesh files.
 - **Check by slicing.** `BambuStudio --slice 0 --outputdir <absolute folder>
   <project.3mf>` writes `result.json`, with `filament_change_times`,
   `total_predication` (seconds) and grams per filament. If the car red or car

@@ -40,7 +40,8 @@ python3 -I "$HERE/filaments.py" "$SETTINGS" "$WORK/ref/ref.3mf" "$WORK/settings.
 # with the pins, the red halves with their gold lettering, and the white and
 # black top.
 CAR="#FFFFFF,#161616,#C12E1F,#FFF144"
-for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR" "beam plate:1:$CAR"; do
+PLATES=()
+for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "beam plate:1:$CAR" "cubes:2:$CAR"; do
   name="${spec%%:*}"; rest="${spec#*:}"; n="${rest%%:*}"; cols="${rest#*:}"
   fils=$(python3 -c "print(';'.join(['$FI']*$n))")
   rm -rf "$WORK/proj"; mkdir -p "$WORK/proj"
@@ -50,18 +51,22 @@ for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR"
       --export-3mf "proj.3mf" "$WORK/plates/Monorail - $name.3mf" > /dev/null 2>&1)
   python3 -I "$HERE/inject_paint.py" "$WORK/plates/Monorail - $name.3mf" "$WORK/proj/proj.3mf" \
       "$OUT/Monorail - $name.3mf" "$cols" "$WORK/settings.3mf" $MODEL | grep "supports:" || true
-  D="$WORK/slice_${name// /_}"; mkdir -p "$D"
-  (cd "$D" && "$B" --slice 0 --outputdir "$D" "$OUT/Monorail - $name.3mf" > cli.log 2>&1)
-  python3 - "$D/result.json" "$name" <<'PY'
+  PLATES+=("${(C)name}=$OUT/Monorail - $name.3mf")
+done
+# The same plates in one project, then one slice of it, plate by plate.
+python3 -I "$HERE/one_project.py" "$OUT/Monorail.3mf" "${PLATES[@]}"
+D="$WORK/slice"; mkdir -p "$D"
+(cd "$D" && "$B" --slice 0 --outputdir "$D" "$OUT/Monorail.3mf" > cli.log 2>&1)
+python3 - "$D/result.json" "${PLATES[@]%%=*}" <<'PY'
 import json, sys
 r = json.load(open(sys.argv[1]))
-for p in r.get('sliced_plates', []):
+print('== slice:', r.get('error_string'))
+for name, p in zip(sys.argv[2:], r.get('sliced_plates', [])):
     t = p.get('feature_type_times', {})
     fil = p.get('filaments', [])
-    print('== {:10s} {}  changes {:3d}  {:4.1f} h (flush {:.0f} min)  g: {}  total {:.0f} g'.format(
-        sys.argv[2], r.get('error_string'), p.get('filament_change_times'), p.get('total_predication', 0) / 3600,
-        t.get('Flush', 0) / 60, [round(f.get('total_used_g', 0)) for f in fil], sum(f.get('total_used_g', 0) for f in fil)))
+    print('== {:12s} changes {:3d}  {:4.1f} h (flush {:.0f} min)  g by filament: {}  total {:.0f} g'.format(
+        name, p.get('filament_change_times'), p.get('total_predication', 0) / 3600, t.get('Flush', 0) / 60,
+        {f.get('id'): round(f.get('total_used_g', 0)) for f in fil}, sum(f.get('total_used_g', 0) for f in fil)))
 PY
-done
 rm -rf "$WORK"
 echo "== print files in $OUT"
