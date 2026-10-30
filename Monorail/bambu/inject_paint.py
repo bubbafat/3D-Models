@@ -3,12 +3,35 @@ Studio wrote for that plate, matching triangles one for one and checking every
 vertex, and give the project the settings of a project you already print with.
 
     python3 inject_paint.py <plate.3mf> <Bambu's project.3mf> <out.3mf> <colour,colour,...> <settings project.3mf>
+        [--petg <a project with a PETG filament>] [--set key=value ...]
+
+--petg gives the supports a PETG interface: that project's PETG filament takes
+a slot the plate does not use, coloured like most of the plate. --set changes
+any project setting, after everything else.
 """
-import sys, re, json, zipfile
+import sys, re, json, zipfile, collections
 import xml.etree.ElementTree as ET
 
 mine, bambu, out, colours, borrowed = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4].split(','), sys.argv[5]
+petg_source, overrides = None, {}
+rest = sys.argv[6:]
+while rest:
+    flag, value, rest = rest[0], rest[1], rest[2:]
+    if flag == '--petg':
+        petg_source = value
+    elif flag == '--set':
+        key, _, setting = value.partition('=')
+        overrides[key] = setting
+    else:
+        sys.exit('unknown option ' + flag)
 C = '{http://schemas.microsoft.com/3dmanufacturing/core/2015/02}'
+
+
+def filament_of(paint):
+    """Filament number of a whole-triangle paint code; unpainted is filament 1."""
+    if not paint:
+        return 1
+    return {'4': 1, '8': 2}.get(paint) or int(paint[:-1], 16) + 3
 
 with zipfile.ZipFile(mine) as z:
     mroot = ET.fromstring(z.read('3D/3dmodel.model'))
@@ -31,6 +54,7 @@ for o in main.iter(C + 'object'):
 
 report = []
 any_support = False
+used = collections.Counter()
 for obj in settings.findall('object'):
     for part in obj.findall('part'):
         meta = {m.get('key'): m.get('value') for m in part.findall('metadata')}
@@ -60,6 +84,7 @@ for obj in settings.findall('object'):
         text, n = re.subn(r'<triangle v1="(\d+)" v2="(\d+)" v3="(\d+)"[^>]*/>', add, text)
         assert n == len(tris), '{}: rewrote {} of {} triangles'.format(name, n, len(tris))
         files[path] = text.encode()
+        used.update(filament_of(t[3]) for t in tris)
         painted = sum(1 for t in tris if t[3])
         supports = sum(1 for t in tris if t[4])
         any_support = any_support or supports > 0
@@ -72,7 +97,7 @@ for obj in settings.findall('object'):
 ps = json.loads(zipfile.ZipFile(borrowed).read('Metadata/project_settings.config'))
 have = len(ps.get('filament_settings_id', []))
 assert have >= len(colours), '{} has {} filaments; the paint needs {}'.format(borrowed, have, len(colours))
-ps['filament_colour'] = colours
+ps['filament_colour'][:len(colours)] = colours
 # Support exactly what to_bambu.py painted for support, and nothing else: tree
 # supports in manual mode, in the part's own filament, with the usual gap for
 # PLA on PLA. Bridges -- the beam channel, the cube slots, the pocket's roof --
@@ -84,6 +109,50 @@ if any_support:
                'support_filament': '0', 'support_interface_filament': '0'})
 else:
     ps['enable_support'] = '0'
+
+# A PETG interface peels cleanly off PLA, so it needs no gap. It goes in the
+# first slot the plate does not use, from 2 -- the same slot on every plate
+# that needs it -- coloured like most of the plate, so stray strands hide.
+# Every per-filament list is copied across but the swatch and the ones that
+# are only that long by coincidence.
+if any_support and petg_source:
+    src = json.loads(zipfile.ZipFile(petg_source).read('Metadata/project_settings.config'))
+    n_src = len(src['filament_settings_id'])
+    s = next((i for i, kind in enumerate(src['filament_type']) if 'PETG' in kind.upper()), None)
+    assert s is not None, '{} has no PETG filament'.format(petg_source)
+    free = [k for k in list(range(2, have + 1)) + [1] if k not in used]
+    assert free, 'the plate uses every filament; there is no slot for the PETG'
+    t = free[0] - 1
+    skip = {'bed_exclude_area', 'printable_area', 'print_compatible_printers', 'wipe_tower_x',
+            'wipe_tower_y', 'different_settings_to_system', 'flush_volumes_matrix',
+            'flush_volumes_vector', 'filament_colour', 'filament_multi_colour',
+            'filament_self_index', 'filament_extruder_variant'}
+    # Some lists hold a value per filament per nozzle variant, as many as each
+    # filament has: filament_self_index says whose each entry is and
+    # filament_extruder_variant which variant. Copy variant for variant, or the
+    # PETG's first where it has fewer.
+    def entries(settings, index):
+        return [(i, v) for i, (f, v) in enumerate(zip(settings['filament_self_index'],
+                                                       settings['filament_extruder_variant']))
+                if int(f) == index + 1]
+    src_entries, dst_entries = entries(src, s), entries(ps, t)
+    n_src_var, n_dst_var = len(src['filament_self_index']), len(ps['filament_self_index'])
+    for key, value in src.items():
+        if key in skip or not isinstance(value, list) or not isinstance(ps.get(key), list):
+            continue
+        if len(value) == n_src and len(ps[key]) == have:
+            ps[key][t] = value[s]
+        elif len(value) == n_src_var and len(ps[key]) == n_dst_var:
+            for i, variant in dst_entries:
+                ps[key][i] = value[next((j for j, v in src_entries if v == variant),
+                                        src_entries[0][0])]
+    main_colour = ps['filament_colour'][used.most_common(1)[0][0] - 1]
+    for key in ('filament_colour', 'filament_multi_colour'):
+        if isinstance(ps.get(key), list) and len(ps[key]) == have:
+            ps[key][t] = main_colour
+    ps.update({'support_interface_filament': str(t + 1), 'support_top_z_distance': '0'})
+    report.append('  supports: PETG interface in filament {}, coloured {}'.format(t + 1, main_colour))
+ps.update(overrides)
 files['Metadata/project_settings.config'] = json.dumps(ps, indent=4).encode()
 
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:

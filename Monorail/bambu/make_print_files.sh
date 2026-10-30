@@ -2,13 +2,18 @@
 # Monorail Countdown.py -> painted, oriented Bambu Studio projects -> slice stats.
 # One run, no GUI. See README.md.
 #
-#   zsh make_print_files.sh <output folder> <a Bambu Studio project of yours with four filaments>
+#   zsh make_print_files.sh <output folder> <a Bambu Studio project of yours with four filaments> \
+#       [<a project of yours with a PETG filament, for the supports' interface>]
 set -e
-if (( $# != 2 )); then
-  echo "usage: zsh make_print_files.sh <output folder> <your four-filament Bambu Studio project.3mf>" >&2
+if (( $# != 2 && $# != 3 )); then
+  echo "usage: zsh make_print_files.sh <output folder> <your four-filament Bambu Studio project.3mf> [<a project with PETG>.3mf]" >&2
   exit 2
 fi
 OUT="${1:a}"; SETTINGS="${2:a}"
+PETG=(); (( $# == 3 )) && PETG=(--petg "${3:a}")
+# The model's own print settings, over yours: the dry fit's 8% lightning infill
+# left the car flexible and see-through.
+MODEL=(--set sparse_infill_density=15% --set sparse_infill_pattern=gyroid --set wall_loops=4)
 HERE="${0:a:h}"
 BRIDGE="${CLAUDEBRIDGE:-$HOME/Library/Application Support/Autodesk/Autodesk Fusion 360/API/AddIns/ClaudeBridge}"
 B=/Applications/BambuStudio.app/Contents/MacOS/BambuStudio
@@ -32,10 +37,11 @@ for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR"
   fils=$(python3 -c "print(';'.join(['$FI']*$n))")
   rm -rf "$WORK/proj"; mkdir -p "$WORK/proj"
   # --outputdir must be absolute: a relative one fails with "Unable to open the file proj.3mf.tmp".
-  (cd "$WORK/proj" && "$B" --load-settings "$M;$PR" --load-filaments "$fils" --outputdir "$WORK/proj" \
+  # --arrange 0 keeps to_bambu.py's layout: packed close, supports collided.
+  (cd "$WORK/proj" && "$B" --arrange 0 --load-settings "$M;$PR" --load-filaments "$fils" --outputdir "$WORK/proj" \
       --export-3mf "proj.3mf" "$WORK/plates/Monorail - $name.3mf" > /dev/null 2>&1)
   python3 -I "$HERE/inject_paint.py" "$WORK/plates/Monorail - $name.3mf" "$WORK/proj/proj.3mf" \
-      "$OUT/Monorail - $name.3mf" "$cols" "$SETTINGS" > /dev/null
+      "$OUT/Monorail - $name.3mf" "$cols" "$SETTINGS" $PETG $MODEL | grep "supports:" || true
   D="$WORK/slice_${name// /_}"; mkdir -p "$D"
   (cd "$D" && "$B" --slice 0 --outputdir "$D" "$OUT/Monorail - $name.3mf" > cli.log 2>&1)
   python3 - "$D/result.json" "$name" <<'PY'

@@ -24,15 +24,24 @@ FLAT_ON_PLUS_Y = lambda x, y, z: (x, z, -y)     # -90 about x: the +y face goes 
 AS_IS = lambda x, y, z: (x, y, z)
 ORIENT = {'Car_Bottom': AS_IS, 'Car_Top': AS_IS,
           'Car_Red_Display': FLAT_ON_MINUS_Y, 'Car_Red_Back': FLAT_ON_PLUS_Y,
-          'Pin_1': AS_IS, 'Pin_2': AS_IS, 'Pin_3': AS_IS, 'Pin_4': AS_IS,
           'Beam': FLAT_ON_MINUS_Y, 'Foot': AS_IS,
           'Cube_1': AS_IS, 'Cube_2': AS_IS, 'Cube_3': AS_IS, 'Cube_4_Spare': AS_IS}
+# The pins stand on end: the ones between the red halves lie across y in the
+# model, the rest stand up already.
+PIN_ORIENT = {'Pin_Red_': FLAT_ON_MINUS_Y}
+
+
+def orient(name):
+    if name.startswith('Pin_'):
+        return next((f for k, f in PIN_ORIENT.items() if name.startswith(k)), AS_IS)
+    return ORIENT[name]
+
 
 # Plates: (file name, [(body, front-left corner x, y on a 256 mm bed)]). The car
-# goes by colour: the white bottom with the pins, the red halves, the top.
+# goes by colour: the white bottom with all the pins, the red halves, the top.
+# 'Pin_*' is every pin, in a row from there.
 PLATES = [
-    ('Monorail - car bottom.3mf', [('Car_Bottom', 40, 60), ('Pin_1', 60, 140),
-                                   ('Pin_2', 75, 140), ('Pin_3', 90, 140), ('Pin_4', 105, 140)]),
+    ('Monorail - car bottom.3mf', [('Car_Bottom', 40, 60), ('Pin_*', 40, 140)]),
     ('Monorail - car red.3mf', [('Car_Red_Display', 40, 60), ('Car_Red_Back', 40, 110)]),
     ('Monorail - car top.3mf', [('Car_Top', 40, 60)]),
     ('Monorail - beam plate.3mf', [('Beam', 44, 30), ('Foot', 63, 90)]),
@@ -130,7 +139,7 @@ for o in root.iter('{%s}object' % NS['c']):
     name = o.get('name')
     cols = groups[o.get('pid')]
     default = cols[int(o.get('pindex'))]
-    f = ORIENT[name]
+    f = orient(name)
     raw = [(float(v.get('x')), float(v.get('y')), float(v.get('z')))
            for v in o.iter('{%s}vertex' % NS['c'])]
     verts = [f(*p) for p in raw]
@@ -157,7 +166,10 @@ RELS = ('<?xml version="1.0" encoding="UTF-8"?>\n'
         '<Relationship Target="/3D/3dmodel.model" Id="rel-1" '
         'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
 
+pins = sorted(n for n in objects if n.startswith('Pin_'))
 for fname, parts in PLATES:
+    parts = [p for name, x, y in parts for p in (
+        [(pin, x + 10 * i, y) for i, pin in enumerate(pins)] if name == 'Pin_*' else [(name, x, y)])]
     out = ['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" '
            'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n<resources>\n']
     build = []

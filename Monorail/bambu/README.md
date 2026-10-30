@@ -23,16 +23,22 @@ export keeps the model's colours, but Bambu Studio ignores them.
 - **A Bambu Studio project of yours with four filaments set up.** Any `.3mf`
   you have printed from with your AMS will do. The print files take your
   printer, process and filament settings from it; nothing in that project is
-  changed. Supports come out on for the car bottom and the red halves, in each
-  part's own filament, and only where they are painted.
+  changed. Over them the print files set the model's own: 15% gyroid infill
+  and 4 walls (`MODEL` in `make_print_files.sh`). Supports come out on for the
+  car bottom and the red halves, only where they are painted.
+- **Optionally, a project of yours with a PETG filament.** Given one, the
+  supports get a PETG interface from its PETG profile. Without, they are in
+  each part's own filament.
 
 ## Run it
 
 From this folder:
 
 ```bash
-zsh make_print_files.sh "<output folder>" "<your four-filament project>.3mf"
+zsh make_print_files.sh "<output folder>" "<your four-filament project>.3mf" "<a project with PETG>.3mf"
 ```
+
+Leave off the last one for supports without PETG.
 
 It takes about a minute, most of it Fusion building the model. It leaves a
 new document open in Fusion, built from
@@ -42,13 +48,15 @@ four AMS filaments, 1 white, 2 black, 3 red, 4 gold, of which it uses:
 
 | File | Parts | Uses |
 |---|---|---|
-| `Monorail - car bottom.3mf` | The car's bottom and the four pins | 1 white |
-| `Monorail - car red.3mf` | The two red halves | 3 red, 4 gold |
+| `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 2 PETG |
+| `Monorail - car red.3mf` | The two red halves | 2 PETG, 3 red, 4 gold |
 | `Monorail - car top.3mf` | The car's top | 1 white, 2 black |
 | `Monorail - beam plate.3mf` | Beam and foot | 1, in grey |
 | `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
 
-Each is one car. To print a batch, add copies of the part in Bambu Studio; the
+Filament 2 is PETG on the car bottom and car red plates only when you give a
+PETG project; when you print, map it to the AMS slot your PETG is in. Each file
+is one car. To print a batch, add copies of the part in Bambu Studio; the
 paint and supports copy with it.
 
 Each line it ends with is one plate's slice: filament changes, hours, minutes
@@ -69,7 +77,10 @@ of flushing, and grams per filament.
 4. `inject_paint.py` writes Bambu's paint onto every triangle of that project,
    checking vertex by vertex that the meshes still match, and swaps in your
    project's settings. A plate with painted supports gets tree supports in
-   manual mode, which supports the painted faces and nothing else.
+   manual mode, which supports the painted faces and nothing else. With a
+   PETG project, the PETG profile goes into the first filament the plate does
+   not use, from 2, and becomes the supports' interface, with no gap, its
+   swatch the colour most of the plate is.
 5. Bambu Studio's command line slices each finished project and reports.
 
 ## What Bambu Studio does that you need to know
@@ -114,9 +125,17 @@ model. It was worked out by testing against Bambu Studio 2.07.
   string, even numbers and switches: `"enable_support": "1"`. Written as a JSON
   number, Bambu ignores it.
 - **The command line packs the plate.** It re-arranges the parts itself, close
-  together. With supports on, five pairs of red halves came out too close and
-  the slice failed with "G-code conflicts"; in Bambu Studio, space them out by
-  hand.
+  together, and with supports on, even one pair of red halves came out too
+  close: "G-code conflicts". `--arrange 0` keeps the layout you give it.
+- **No-print corner.** The P1S keeps parts clear of an area at the front left
+  of the bed; a part placed at x 10 failed with "too close to exclusion area".
+- **Some filament settings are per nozzle variant.** Lists such as
+  `nozzle_temperature` hold a value per filament per variant, and a filament
+  can have one variant or two, so a list's length is not a multiple of the
+  filament count. `filament_self_index` says which filament each entry belongs
+  to, and `filament_extruder_variant` which variant. Copying a filament from one
+  project to another has to follow them, or it silently keeps the old values:
+  PETG at PLA's 220 °C.
 - **Check by slicing.** `BambuStudio --slice 0 --outputdir <absolute folder>
   <project.3mf>` writes `result.json`, with `filament_change_times`,
   `total_predication` (seconds) and grams per filament. If the car red or car

@@ -33,13 +33,12 @@ A Disney monorail on its beam, counting down the same way.
   reads **VACATION IS CALLING!**
 - The car straddles a straight beam on two pylons; a bump on the beam centres
   it. The spare cube stows in the tail.
-- 177 × 56 × 76 mm, 14 printable parts. The car is cut along its colours
+- 177 × 56 × 76 mm, 23 printable parts. The car is cut along its colours
   into a white bottom, a red stripe in two halves with gold lettering, and a
-  white and black top, so each prints in one colour or close to it; the beam
-  and foot are grey.
-- **Status:** earlier versions, printed in two halves, checked the fit; the
-  car cut along its colours has not been printed yet. The pictures are
-  renders.
+  white and black top, so each prints in one colour or close to it; every
+  joint is pinned. The beam and foot are grey.
+- **Status:** a dry fit of the car cut along its colours led to pins, lips and
+  denser infill, which have not been printed yet. The pictures are renders.
 
 Script: [`Monorail Countdown.py`](Monorail/Monorail%20Countdown.py)
 

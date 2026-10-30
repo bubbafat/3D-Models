@@ -36,9 +36,9 @@ python3 send.py run "/path/to/Monorail Countdown.py"
 
 ## What it makes
 
-Fourteen bodies, 176.6 × 56 × 76 mm assembled.
+Twenty-three bodies, 176.6 × 56 × 76 mm assembled.
 
-![The car's four parts, pulled apart](render-parts.png)
+![The car's four parts and the beam, pulled apart, with their pins](render-parts.png)
 
 | Body | What it is | Print it |
 |---|---|---|
@@ -46,7 +46,10 @@ Fourteen bodies, 176.6 × 56 × 76 mm assembled.
 | `Car_Red_Display` | The display half of the red stripe, with the lettering | On its cut face |
 | `Car_Red_Back` | The back half of the red stripe | On its cut face |
 | `Car_Top` | White, the black band and frames, white roof, with the cube slots | Standing on its flat bottom |
-| `Pin_1`–`Pin_4` | Loose pins that locate the top on the red | Standing on end |
+| `Pin_Red_1`–`2` | Loose pins between the red halves | Standing on end |
+| `Pin_Seat_1`–`4` | Loose pins between the red halves and the bottom | Standing on end |
+| `Pin_Top_1`–`4` | Loose pins between the red halves and the top | Standing on end |
+| `Pin_Beam_1`–`3` | Loose pins, 10 mm long, between the beam and the car | Standing on end |
 | `Beam` | The beam and both pylons, one piece | On its side |
 | `Foot` | The plate the pylons plug into | Flat |
 | `Cube_1`–`Cube_3` | The countdown cubes | A digit face down |
@@ -66,8 +69,17 @@ superstructure, so each part prints in one colour or close to it:
 The red stripe is set 0.8 mm into the body, so the bottom's top face has a
 ledge round it, as the ship's deck does round its superstructure. Like the
 ship, it carries a 0.4 mm locating recess, with 0.1 mm clearance a side, that
-both red halves stand in. The top overhangs the red, so instead four pins
-locate it, in sockets in both.
+both red halves stand in, so a white rim hides the joint. The top hides its
+joint the same way: a white lip 0.4 mm deep covers the red's top edge. The top
+prints standing on its underside, where a recess the width of the red would be
+a bridge just off the bed, so the red carries a 1.2 mm rib along its edge
+instead, which fits a groove behind the lip.
+
+Every joint is pinned, with loose pins in sockets in both parts, so every part
+still lies flat on the bed: two between the red halves, two from each red half
+to the bottom, two to the top, and three, 10 mm long, from the beam into the
+belly. The beam's top runs 5 mm up into the belly, so the channel's sides can
+be glued as well.
 
 ## Colours
 
@@ -95,40 +107,42 @@ plate. Otherwise, paint in the slicer.
 ## Printing
 
 Sliced in Bambu Studio 2.07 for a P1S with a 0.4 mm nozzle, 0.2 mm layers,
-PLA and 8% lightning infill. One car:
+PLA, 15% gyroid infill and 4 walls. The dry fit, at 8% lightning and 3 walls,
+was too flexible and let light through the white. One car:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car bottom and pins | 1.1 h | 0 | 26 g |
-| Car red halves | 1.1 h | 1 | 30 g |
-| Car top | 5.9 h | 122 | 114 g |
-| Beam and foot | 0.9 h | 0 | 30 g |
-| Cubes (optional) | 3.6 h | 70 | 60 g |
+| Car bottom and pins | 3.6 h | 56 | 58 g, and 11 g PETG |
+| Car red halves | 1.6 h | 3 | 46 g |
+| Car top | 6.4 h | 122 | 132 g |
+| Beam and foot | 1.2 h | 0 | 41 g |
+| Cubes (optional) | 3.8 h | 70 | 65 g |
 
-The red plate changes colour once: the red ends at the stripe's floor and the
-letters stand on it, so everything above is gold. The top's changes come from
-the black band and frames, which are in every layer from its bottom to 24 mm
-up. The changes are paid per layer, not per part, so batches share them. Per
-car, measured on full plates:
+The red plate barely changes colour: the red ends at the stripe's floor and
+the letters stand on it, so everything above is gold. The top's changes come
+from the black band and frames, which are in every layer from its bottom to
+24 mm up, and the bottom's from the PETG under its nose. The changes are paid
+per layer, not per part, so batches share them. Per car, measured on full
+plates:
 
 | Batch | Per car |
 |---|---|
-| 4 bottoms a plate | 1.0 h, 26 g |
-| 5 pairs of red halves a plate | about 0.9 h, 27 g |
-| 4 tops a plate | 2.4 h, 61 g, about 31 changes |
+| 4 bottoms a plate | 1.8 h, 44 g with the PETG, 14 changes |
+| 5 pairs of red halves a plate | 1.3 h, 42 g |
+| 4 tops a plate | 2.9 h, 80 g, 31 changes |
 
-That is about 4.3 h and 114 g a car. The earlier car, in two halves, took
-9.8 h and 168 g printed one to a plate; it was not measured in batches. The
-five pairs of red halves were sliced without supports, which add about 1 g
-and 5 minutes a pair.
+That is about 6.1 h and 166 g a car, pins aside. The earlier car, in two
+halves, took 9.8 h and 168 g printed one to a plate at 8% lightning; it was
+not measured in batches.
 
 **Supports.** The bottom is supported under the nose, and each red half under
 its tail end, which overhangs the spare pocket. Nothing else is: the beam
 channel, the cube slots and the pocket's roof are bridges, which print fine,
 and support inside them would be hard to clear out. Bambu's own supports
 filled those too, so the print files have supports painted on where they are
-wanted, and Bambu supports nothing else. The supports are in the part's own
-filament. A PETG interface on the bottom cost 58 filament changes, because the
+wanted, and Bambu supports nothing else. The supports' interface is PETG,
+which peels cleanly off PLA, in the colour of the parts it holds up, so a stray
+strand hides. It costs the bottom plate 56 filament changes, because the
 nose's underside meets its supports at almost every height.
 
 **The nose.** The red halves still print on their cut faces, so their nose
@@ -138,11 +152,11 @@ on a gentler curve than its height, so it leaves the flank more steeply: at
 were 7.1, 2.3 and 1.8 mm. The top prints standing up, so its nose is an
 upright wall.
 
-**Assembly.** Stand the red halves in the bottom's recess and glue them in and
-to each other, push the pins into the red halves' sockets, then glue the top
-on. Glue the pylons into the foot. The car lifts on and off the beam: the
-beam's flat top runs in a channel in the belly, and a bump on the beam drops
-into a notch in the channel, so the car always sits centred.
+**Assembly.** Pin and glue the red halves to each other first, so they line
+up before they meet anything else. Then pin and glue them into the bottom's
+recess, and pin and glue the top on. Glue the pylons into the foot. Last, push
+the beam's pins into the beam, and glue the car onto them and along the
+channel's sides.
 
 ## The cubes
 
@@ -182,5 +196,10 @@ halves, each on its cut face; test prints checked the cube fit, the beam and the
 spare pocket. The first one in full colour showed stepped layers where the nose
 leaves the flank, red flecks on the white there, and a white line down the
 nose where the halves met: each half's first layer takes the colour of its
-unpainted cut face. That led to cutting the car along its colours instead,
-which has not been printed yet.
+unpainted cut face. That led to cutting the car along its colours instead.
+
+A dry fit of that, at 8% lightning, sat loosely on the beam and showed gaps
+at the joints, and the white was flexible and let light through. Since then
+every joint is pinned, the car sits deeper on the beam, the top's joint has a
+lip like the bottom's, and the infill is 15% gyroid with 4 walls. That version
+has not been printed yet.
