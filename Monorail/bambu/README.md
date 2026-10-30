@@ -80,7 +80,8 @@ of flushing, and grams per filament.
    manual mode, which supports the painted faces and nothing else. With a
    PETG project, the PETG profile goes into the first filament the plate does
    not use, from 2, and becomes the supports' interface, with no gap, its
-   swatch the colour most of the plate is.
+   swatch the colour most of the plate is. That plate also stops flushing into
+   the parts' infill, so no PETG ends up inside a PLA part.
 5. Bambu Studio's command line slices each finished project and reports.
 
 ## What Bambu Studio does that you need to know

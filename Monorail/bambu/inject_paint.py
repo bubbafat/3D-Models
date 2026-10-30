@@ -150,7 +150,10 @@ if any_support and petg_source:
     for key in ('filament_colour', 'filament_multi_colour'):
         if isinstance(ps.get(key), list) and len(ps[key]) == have:
             ps[key][t] = main_colour
-    ps.update({'support_interface_filament': str(t + 1), 'support_top_z_distance': '0'})
+    # Purge goes to the chute, not into the infill: PETG flushed into PLA infill
+    # is a weak layer inside the part. It costs the car bottom about 3 g.
+    ps.update({'support_interface_filament': str(t + 1), 'support_top_z_distance': '0',
+               'flush_into_infill': '0'})
     report.append('  supports: PETG interface in filament {}, coloured {}'.format(t + 1, main_colour))
 ps.update(overrides)
 files['Metadata/project_settings.config'] = json.dumps(ps, indent=4).encode()
