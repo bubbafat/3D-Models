@@ -26,9 +26,9 @@ export keeps the model's colours, but Bambu Studio ignores them.
   changed. Over them the print files set the model's own: 15% gyroid infill
   and 4 walls (`MODEL` in `make_print_files.sh`). Supports come out on for the
   car bottom and the red halves, only where they are painted.
-- **Optionally, a project of yours with a PETG filament.** Given one, the
-  supports get a PETG interface from its PETG profile. Without, they are in
-  each part's own filament.
+- **Optionally, a project of yours with a PETG filament.** Given one, its
+  PETG profile becomes filament 6 and the supports' interface. Without, the
+  supports are in each part's own filament.
 
 ## Run it
 
@@ -43,21 +43,23 @@ Leave off the last one for supports without PETG.
 It takes about a minute, most of it Fusion building the model. It leaves a
 new document open in Fusion, built from
 `Monorail Countdown.py`. Close that document without saving; the script never
-closes any of your documents. The output folder gets five files, each with your
-four AMS filaments, 1 white, 2 black, 3 red, 4 gold, of which it uses:
+closes any of your documents. The output folder gets five files. Every one has
+the same filaments, so a filament number means the same in each, and a part
+imported into another file's project keeps its colours: your four AMS
+filaments, 1 white, 2 black, 3 red, 4 gold, then 5 grey, a copy of your
+filament 1, and 6 PETG, if you gave a PETG project. Of those, each uses:
 
 | File | Parts | Uses |
 |---|---|---|
-| `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 2 PETG |
-| `Monorail - car red.3mf` | The two red halves | 2 PETG, 3 red, 4 gold |
+| `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 6 PETG |
+| `Monorail - car red.3mf` | The two red halves | 3 red, 4 gold, 6 PETG |
 | `Monorail - car top.3mf` | The car's top | 1 white, 2 black |
-| `Monorail - beam plate.3mf` | Beam and foot | 1, in grey |
+| `Monorail - beam plate.3mf` | Beam and foot | 5 grey |
 | `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
 
-Filament 2 is PETG on the car bottom and car red plates only when you give a
-PETG project; when you print, map it to the AMS slot your PETG is in. Each file
-is one car. To print a batch, add copies of the part in Bambu Studio; the
-paint and supports copy with it.
+When you print a plate, map the filaments it uses to your AMS. Each file is
+one car. To print a batch, add copies of the part in Bambu Studio; the paint
+and supports copy with it.
 
 Each line it ends with is one plate's slice: filament changes, hours, minutes
 of flushing, and grams per filament.
@@ -73,16 +75,16 @@ of flushing, and grams per filament.
    need them -- the bottom's nose underside, the red halves' tail ends over
    the spare pocket -- then turns each part to its print orientation and
    writes one 3MF per plate.
-3. Bambu Studio's command line turns each plate into a Bambu project.
-4. `inject_paint.py` writes Bambu's paint onto every triangle of that project,
-   checking vertex by vertex that the meshes still match, and swaps in your
-   project's settings. A plate with painted supports gets tree supports in
-   manual mode, which supports the painted faces and nothing else. With a
-   PETG project, the PETG profile goes into the first filament the plate does
-   not use, from 2, and becomes the supports' interface, with no gap, its
-   swatch the colour most of the plate is. That plate also stops flushing into
-   the parts' infill, so no PETG ends up inside a PLA part.
-5. Bambu Studio's command line slices each finished project and reports.
+3. `filaments.py` makes the one set of settings every plate gets: your
+   project's, with grey and the PETG added as filaments 5 and 6.
+4. Bambu Studio's command line turns each plate into a Bambu project.
+5. `inject_paint.py` writes Bambu's paint onto every triangle of that project,
+   checking vertex by vertex that the meshes still match, and swaps in those
+   settings. A plate with painted supports gets tree supports in manual mode,
+   which supports the painted faces and nothing else; with the PETG, its
+   interface is PETG, with no gap, and that plate stops flushing into the
+   parts' infill, so no PETG ends up inside a PLA part.
+6. Bambu Studio's command line slices each finished project and reports.
 
 ## What Bambu Studio does that you need to know
 
@@ -130,6 +132,15 @@ model. It was worked out by testing against Bambu Studio 2.07.
   close: "G-code conflicts". `--arrange 0` keeps the layout you give it.
 - **No-print corner.** The P1S keeps parts clear of an area at the front left
   of the bed; a part placed at x 10 failed with "too close to exclusion area".
+- **Adding a filament touches four kinds of list.** A value per filament
+  (temperatures, colours; the AMS drying lists have four each); a value per
+  filament per nozzle variant (below); the purge volumes, a grid of every
+  filament against every other; and two lists with an entry for the process
+  first and the printer last. Some machine lists are as long as the filament
+  list only by coincidence. A one-filament project from Bambu's command line
+  tells most of them apart. The purges `filaments.py` gives a new filament are
+  those of the filament it looks like, and 140 mm3 between two that look
+  alike; Bambu Studio recalculates them when you change a swatch.
 - **Some filament settings are per nozzle variant.** Lists such as
   `nozzle_temperature` hold a value per filament per variant, and a filament
   can have one variant or two, so a list's length is not a multiple of the

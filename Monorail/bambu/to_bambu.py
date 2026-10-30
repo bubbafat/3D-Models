@@ -13,7 +13,7 @@ NS = {'c': 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02',
       'm': 'http://schemas.microsoft.com/3dmanufacturing/material/2015/02'}
 
 FILAMENT = {'#EEEEE8': 1, '#1C1C20': 2, '#30343A': 2, '#BE1C22': 3, '#EEB228': 4,
-            '#96989E': 1, '#A0A0A0': 1}
+            '#96989E': 5, '#A0A0A0': 5}      # grey is filament 5: see filaments.py
 
 def paint_code(s):
     return {1: '4', 2: '8'}.get(s) or '{:X}C'.format(s - 3)

@@ -10,7 +10,7 @@ if (( $# != 2 && $# != 3 )); then
   exit 2
 fi
 OUT="${1:a}"; SETTINGS="${2:a}"
-PETG=(); (( $# == 3 )) && PETG=(--petg "${3:a}")
+PETG=(); (( $# == 3 )) && PETG=("${3:a}")
 # The model's own print settings, over yours: the dry fit's 8% lightning infill
 # left the car flexible and see-through.
 MODEL=(--set sparse_infill_density=15% --set sparse_infill_pattern=gyroid --set wall_loops=4)
@@ -28,11 +28,19 @@ echo "== build and export in Fusion"
 python3 "$HERE/build_and_export.py" "$BRIDGE" "$HERE/../Monorail Countdown.py" "$WORK/monorail.3mf"
 echo "== convert"
 python3 -I "$HERE/to_bambu.py" "$WORK/monorail.3mf" "$WORK/plates" | grep -E "letter sides|\.3mf"
-# plate name : filaments for the first pass : filament colours in the finished project.
-# The car is in three plates by colour: the white bottom with the pins, the red
-# halves with their gold lettering, and the white and black top.
+# One filament list for every plate, so a filament number means the same in
+# each file: your four, then grey and PETG. filaments.py sorts Bambu's lists by
+# comparing with a one-filament project of Bambu's own.
+mkdir -p "$WORK/ref"
+(cd "$WORK/ref" && "$B" --arrange 0 --load-settings "$M;$PR" --load-filaments "$FI" --outputdir "$WORK/ref" \
+    --export-3mf "ref.3mf" "$WORK/plates/Monorail - beam plate.3mf" > /dev/null 2>&1)
+python3 -I "$HERE/filaments.py" "$SETTINGS" "$WORK/ref/ref.3mf" "$WORK/settings.3mf" $PETG
+# plate name : filaments for the first pass : your four filaments' colours in
+# the finished project. The car is in three plates by colour: the white bottom
+# with the pins, the red halves with their gold lettering, and the white and
+# black top.
 CAR="#FFFFFF,#161616,#C12E1F,#FFF144"
-for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR" "beam plate:1:#8E9089,#161616,#C12E1F,#FFF144"; do
+for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR" "beam plate:1:$CAR"; do
   name="${spec%%:*}"; rest="${spec#*:}"; n="${rest%%:*}"; cols="${rest#*:}"
   fils=$(python3 -c "print(';'.join(['$FI']*$n))")
   rm -rf "$WORK/proj"; mkdir -p "$WORK/proj"
@@ -41,7 +49,7 @@ for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "cubes:2:$CAR"
   (cd "$WORK/proj" && "$B" --arrange 0 --load-settings "$M;$PR" --load-filaments "$fils" --outputdir "$WORK/proj" \
       --export-3mf "proj.3mf" "$WORK/plates/Monorail - $name.3mf" > /dev/null 2>&1)
   python3 -I "$HERE/inject_paint.py" "$WORK/plates/Monorail - $name.3mf" "$WORK/proj/proj.3mf" \
-      "$OUT/Monorail - $name.3mf" "$cols" "$SETTINGS" $PETG $MODEL | grep "supports:" || true
+      "$OUT/Monorail - $name.3mf" "$cols" "$WORK/settings.3mf" $MODEL | grep "supports:" || true
   D="$WORK/slice_${name// /_}"; mkdir -p "$D"
   (cd "$D" && "$B" --slice 0 --outputdir "$D" "$OUT/Monorail - $name.3mf" > cli.log 2>&1)
   python3 - "$D/result.json" "$name" <<'PY'

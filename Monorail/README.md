@@ -83,15 +83,18 @@ be glued as well.
 
 ## Colours
 
-| | Car (four AMS slots) |
+| Filament | What |
 |---|---|
-| 1 white | The body |
-| 2 black | Window band, cube frames, tail coupler, windshield |
+| 1 white | The car's body, the pins, the cubes |
+| 2 black | Window band, cube frames, tail coupler, windshield, the cube digits |
 | 3 red | Stripe, tail lights |
 | 4 gold | Lettering |
+| 5 grey | Beam and foot |
+| 6 PETG | The supports' interface |
 
-The beam and foot are grey, printed on their own plate. The cubes are white
-with black digits.
+Every print file has these six, in this order, so a part imported into another
+file's project keeps its colours. No plate uses more than three; when you print
+one, map those to your AMS.
 
 Every colour region is a real step in the surface — recessed 0.6–0.8 mm or
 raised — never just a painted face, because the slicer's colour fill needs an
@@ -112,10 +115,10 @@ was too flexible and let light through the white. One car:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car bottom and pins | 3.6 h | 56 | 58 g, and 11 g PETG |
+| Car bottom and pins | 3.1 h | 56 | 46 g, and 8 g PETG |
 | Car red halves | 1.6 h | 3 | 46 g |
 | Car top | 6.4 h | 122 | 132 g |
-| Beam and foot | 1.2 h | 0 | 41 g |
+| Beam and foot | 1.2 h | 0 | 40 g |
 | Cubes (optional) | 3.8 h | 70 | 65 g |
 
 The red plate barely changes colour: the red ends at the stripe's floor and
@@ -127,11 +130,11 @@ plates:
 
 | Batch | Per car |
 |---|---|
-| 4 bottoms a plate | 1.8 h, 44 g with the PETG, 14 changes |
+| 4 bottoms a plate | 1.7 h, 41 g with the PETG, 14 changes |
 | 5 pairs of red halves a plate | 1.3 h, 42 g |
 | 4 tops a plate | 2.9 h, 80 g, 31 changes |
 
-That is about 6.1 h and 166 g a car, pins aside. The earlier car, in two
+That is about 5.9 h and 163 g a car, pins aside. The earlier car, in two
 halves, took 9.8 h and 168 g printed one to a plate at 8% lightning; it was
 not measured in batches.
 
