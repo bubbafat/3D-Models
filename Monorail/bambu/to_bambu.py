@@ -22,8 +22,11 @@ def paint_code(s):
 FLAT_ON_MINUS_Y = lambda x, y, z: (x, -z, y)    # +90 about x: the -y face goes down
 FLAT_ON_PLUS_Y = lambda x, y, z: (x, z, -y)     # -90 about x: the +y face goes down
 AS_IS = lambda x, y, z: (x, y, z)
-ORIENT = {'Car_Bottom': AS_IS, 'Car_Top': AS_IS,
+ORIENT = {'Car_Bottom': AS_IS, 'Car_Pinstripe': AS_IS, 'Car_Band': AS_IS, 'Car_Roof': AS_IS,
           'Car_Red_Display': FLAT_ON_MINUS_Y, 'Car_Red_Back': FLAT_ON_PLUS_Y,
+          # each frame is a cup, open to +y: on its back, open side up
+          'Car_Frame_1': FLAT_ON_MINUS_Y, 'Car_Frame_2': FLAT_ON_MINUS_Y,
+          'Car_Frame_3': FLAT_ON_MINUS_Y,
           'Beam': FLAT_ON_MINUS_Y, 'Foot': AS_IS,
           'Cube_1': AS_IS, 'Cube_2': AS_IS, 'Cube_3': AS_IS, 'Cube_4_Spare': AS_IS}
 # The pins stand on end: the ones between the red halves lie across y in the
@@ -38,12 +41,15 @@ def orient(name):
 
 
 # Plates: (file name, [(body, front-left corner x, y on a 256 mm bed)]). The car
-# goes by colour: the white bottom with all the pins, the red halves, the top.
-# 'Pin_*' is every pin, in a row from there.
+# goes by colour: the white bottom with all the pins, the red halves, the top's
+# white pinstripe and roof, and its black band and frames. 'Pin_*' is every
+# pin, in a row from there.
 PLATES = [
-    ('Monorail - car bottom.3mf', [('Car_Bottom', 40, 60), ('Pin_*', 40, 140)]),
+    ('Monorail - car bottom.3mf', [('Car_Bottom', 40, 60), ('Pin_*', 30, 140)]),
     ('Monorail - car red.3mf', [('Car_Red_Display', 40, 60), ('Car_Red_Back', 40, 110)]),
-    ('Monorail - car top.3mf', [('Car_Top', 40, 60)]),
+    ('Monorail - car top white.3mf', [('Car_Pinstripe', 40, 50), ('Car_Roof', 40, 130)]),
+    ('Monorail - car top black.3mf', [('Car_Band', 40, 50), ('Car_Frame_1', 60, 130),
+                                      ('Car_Frame_2', 100, 130), ('Car_Frame_3', 140, 130)]),
     ('Monorail - beam plate.3mf', [('Beam', 44, 30), ('Foot', 63, 90)]),
     ('Monorail - cubes.3mf', [('Cube_1', 70, 100), ('Cube_2', 100, 100),
                               ('Cube_3', 130, 100), ('Cube_4_Spare', 160, 100)]),

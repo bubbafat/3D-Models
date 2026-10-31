@@ -15,14 +15,19 @@
 # full-width lower body that straddles a straight concrete beam on two pylons, as the real Mark VI does, pinned
 # and glued to the beam, and the spare cube stowed in the tail.
 #
-# Fourteen printable bodies:
+# The printable bodies:
 #
 #   Car_Bottom    the white belly, up to the red stripe -- print belly down
 #   Car_Red_Display, Car_Red_Back
 #                 the red stripe, cut down the middle -- print on the cut face
-#   Car_Top       white, black band, white roof, with the cube slots -- print
-#                 standing on its flat bottom
-#   Pin_1..4      loose pins locating the top on the red -- print on end
+#   Car_Pinstripe the white strip over the red, and the white tail end behind
+#                 the window band -- print flat
+#   Car_Band      the black window band, windshield and all -- print flat
+#   Car_Roof      the white roof -- print flat
+#   Car_Frame_1..3
+#                 the black cube frames, each a cup round its slot -- print on
+#                 its back
+#   Pin_*         loose pins, on every joint -- print on end
 #   Beam          the beam and its two pylons, one piece -- print on its side
 #   Foot          the plate the pylons plug into -- print flat
 #   Cube_1..3     the three countdown cubes
@@ -36,7 +41,7 @@
 # own plate in the fifth:
 #
 #   white       the car body
-#   black       window band, cube frames, tail coupler, and the windshield --
+#   black       window band, cube frames, and the windshield --
 #               recessed a step deeper than the band, so it still reads as glass
 #   red         stripe and the two tail lights
 #   gold        lettering
@@ -57,9 +62,12 @@
 #   - The red stripe is cut down the middle and each half lies on its cut
 #     face, so the gold lettering is only the last few layers. Over the spare
 #     pocket the tail end needs support.
-#   - The top prints standing on its flat bottom: the black band and frames are
-#     upright walls, and the cube slots and the pocket's roof are bridges. Four
-#     loose pins locate it on the red halves.
+#   - The top is cut where its colours meet too: the white pinstripe, the black
+#     window band and the white roof lie one on another, and each prints flat
+#     in one colour. The three black cube frames are cups that print on their
+#     backs and stand in pockets through all three. The joints fall on the
+#     band's own steps, the white standing proud of the black, so a gap there
+#     shows against black. Loose pins locate each layer on the one below.
 #
 #   Set SPLIT_CAR = False below to get one body instead.
 #
@@ -178,7 +186,7 @@ def run(context):
         SPLIT_CAR = True              # see the note at the top of the file
         PREVIEW_COLOURS = True        # paint the model in Fusion the way it prints
 
-        set_param('totalLength', '177 mm', 'mm', 'Overall footprint -- the car plus its tail coupler')
+        set_param('totalLength', '176 mm', 'mm', 'Overall footprint -- the car plus its tail lights')
         set_param('totalHeight', '76 mm', 'mm', 'Desk to roof')
         set_param('carLength', '174 mm', 'mm', 'Car nose to tail face')
         set_param('carWidth', '42 mm', 'mm', 'Car width across the flanks')
@@ -290,9 +298,8 @@ def run(context):
         glassPointX, glassPointZ = carX1 - 35.0, 38.7   # a small point near the top,
         glassBotRearX = carX1 - 26.5  # then a long rake down and forward
 
-        # The tail face carries the spare cube's pocket, the coupler block above
-        # it, and a red tail light either side at stripe height.
-        couplerHalfW, couplerZ0, couplerZ1, couplerProud = 7.0, 36.5, 45.5, 3.0
+        # The tail face carries the spare cube's pocket and a red tail light
+        # either side at stripe height.
         lightY, lightHalfW, lightZ0, lightZ1, lightProud = 16.0, 1.2, 19.5, 22.5, 2.0
 
         cube, clearance = 20.0, 0.6
@@ -320,8 +327,7 @@ def run(context):
         spareDepth = cube + 1.2       # the cube sits 1.2 mm in from the tail face
         sparePocketSize = cube + spareClearance
         spareZ0 = lightZ0 + (lightZ1 - lightZ0 - sparePocketSize) / 2.0
-                                      # centred on the tail lights, which leaves
-                                      # room for the top notch under the coupler
+                                      # centred on the tail lights
         spareZ1 = spareZ0 + sparePocketSize
         spareCentreZ = (spareZ0 + spareZ1) / 2.0
         spareGripR = 3.0              # finger notch in the pocket's top and bottom
@@ -343,13 +349,21 @@ def run(context):
         # wide, along its edge, and the top a groove behind the lip for it.
         seatDepth, seatGap = 0.4, 0.1
         lipRib = 1.2
+        # The top's own joints are at the band's lower and upper edges, where
+        # the white already stands bandDepth proud of the black, so they need
+        # no lip. Each cube frame stands in its pocket frameFit clear a side,
+        # and frameRoofFit under the roof: over the frame the roof prints a
+        # bridge, which sags, and 0.1 mm would round to no gap at all in
+        # 0.2 mm layers.
+        frameFit, frameRoofFit = 0.1, 0.3
         # Every joint is pinned: loose pins in sockets in both parts, so every
         # part lies flat on the bed. Standing on end at these (x, y) across the
-        # red-top joint and the seat, lying across the cut between the red
-        # halves at (x, z), and standing in the beam's top at x, beamPinH into
-        # each part there.
+        # red-top joint, the seat, and both of the band's edges, lying across
+        # the cut between the red halves at (x, z), and standing in the beam's
+        # top at x, beamPinH into each part there.
         pinDia, pinH, pinFit, socketExtra = 4.0, 3.0, 0.4, 0.5
         TOP_PIN_XY = [(-75.0, 15.0), (-75.0, -15.0), (50.0, 10.0), (50.0, -10.0)]
+        BAND_PIN_XY = [(-60.0, 12.0), (-60.0, -12.0), (40.0, 8.0), (40.0, -8.0)]
         SEAT_PIN_XY = [(-40.0, 12.0), (-40.0, -12.0), (30.0, 12.0), (30.0, -12.0)]
         RED_PIN_XZ = [(-45.0, 17.5), (40.0, 17.5)]
         beamPinH = 5.0
@@ -545,22 +559,17 @@ def run(context):
 
         # The spare cube's pocket in the tail face.
         tailCap = tail_section(1.0, 0.0)
-        require(spareZ0 > tailCap[2] + 2.0 and spareZ1 < couplerZ0 - 2.0,
-                'The spare pocket runs z {:.1f} to {:.1f}; the tail face is {:.1f} to '
-                '{:.1f} with the coupler from {:.1f}.'
-                .format(spareZ0, spareZ1, tailCap[2], tailCap[3], couplerZ0))
+        require(spareZ0 > tailCap[2] + 2.0 and spareZ1 + spareGripR < bandZ1 - 2.0,
+                'The spare pocket runs z {:.1f} to {:.1f} with its notches; the tail face '
+                'is {:.1f} to {:.1f}, and the roof sits on the band at {:.1f}.'
+                .format(spareZ0, spareZ1 + spareGripR, tailCap[2], tailCap[3], bandZ1))
         require(carX0 + spareDepth < arrayX0 - 2.0,
                 'The spare pocket reaches the display slots.')
-        require(spareZ0 - spareGripR > beamCrestZ + 2.0
-                and spareZ1 + spareGripR < couplerZ0 - 1.0,
-                'Finger notches run z {:.1f} to {:.1f}, too close to the beam channel '
-                '({:.1f}) or the coupler ({:.1f}).'.format(
-                    spareZ0 - spareGripR, spareZ1 + spareGripR, beamCrestZ, couplerZ0))
+        require(spareZ0 - spareGripR > beamCrestZ + 2.0,
+                'Finger notches run down to z {:.1f}, too close to the beam channel '
+                '({:.1f}).'.format(spareZ0 - spareGripR, beamCrestZ))
         require(spareGripHalfW < sparePocketSize / 2.0 - 3.0,
                 'The finger notches reach the pocket\'s side walls.')
-        require(couplerZ1 < tailCap[3] - 1.0 and couplerHalfW < tailCap[1] - 2.0
-                and couplerZ0 + couplerProud < couplerZ1 - 3.0,
-                'The tail coupler does not fit on the tail face.')
         require(lightY - lightHalfW > sparePocketSize / 2.0 + 2.0
                 and lightY + lightHalfW < tailCap[1] - 1.0,
                 'The tail lights do not fit between the spare pocket and the edge.')
@@ -603,6 +612,32 @@ def run(context):
             require(abs(py) + socketR < carHalfW - stripeDepth - lipRib - seatGap - 1.0,
                     'The pin at x {:.0f}, y {:.0f} runs into the groove behind the top\'s '
                     'lip.'.format(px, py))
+        # The top's own pins, the same places at both of the band's edges: clear
+        # of the frames' pockets and the spare pocket, and in the pinstripe,
+        # which is only bandZ0 - stripeZ1 thick, clear of the red's pins too.
+        require(frameGap - 2.0 * frameFit >= 1.0,
+                'The white between the frames\' pockets is {:.1f} mm -- too thin to print.'
+                .format(frameGap - 2.0 * frameFit))
+        require(bandZ1 - bandZ0 > 2.0 * (pinH + socketExtra) + 1.0,
+                'The band is too thin for sockets from above and below.')
+        for (px, py) in BAND_PIN_XY:
+            sec = section_at(px)
+            require(all(inside_section(abs(py) + sgn * socketR, z, sec, 1.5)
+                        for sgn in (-1.0, 1.0)
+                        for z in (bandZ0 - pinH - socketExtra, bandZ1 + pinH + socketExtra)),
+                    'The band pin at x {:.0f}, y {:.0f} is too near the skin.'.format(px, py))
+            require(not (arrayX0 - frameFit - socketR - 1.5 < px < arrayX1 + frameFit + socketR + 1.5
+                         and py + socketR > slotFloorY - 1.0 - frameFit - 1.5),
+                    'The band pin at x {:.0f}, y {:.0f} runs into a frame\'s pocket.'
+                    .format(px, py))
+            require(px - socketR > carX0 + spareDepth + 1.5,
+                    'The band pin at x {:.0f} runs into the spare pocket or the white tail '
+                    'end.'.format(px))
+            require(bandZ0 - stripeZ1 > 2.0 * (pinH + socketExtra) + 1.0
+                    or min(math.hypot(px - qx, py - qy) for qx, qy in TOP_PIN_XY)
+                    > 2.0 * socketR + 1.5,
+                    'The band pin at x {:.0f}, y {:.0f} meets one of the red\'s pins in the '
+                    'pinstripe.'.format(px, py))
         seatJoint = stripeZ0 - seatDepth
         for (px, py) in SEAT_PIN_XY:
             sec = section_at(px)
@@ -1307,22 +1342,14 @@ def run(context):
                 'The window band did not reach the back flank.')
 
         # ------------------------------------------ raised details: frames etc.
-        # The cube frames, the coupler block on the tail and the two red tail
-        # lights. All raised, so each is its own colour region with real edges,
-        # and all joined in one combine.
+        # The cube frames and the two red tail lights. All raised, so each is its
+        # own colour region with real edges, and all joined in one combine.
         raised = []
         for k, xc in enumerate(displayCentres):
             raised.append(box_body('Frame_{}'.format(k),
                                    xc - frameW / 2.0, xc + frameW / 2.0,
                                    slotFloorY - 1.0, frameFaceY,
                                    frameZ0, frameZ1))
-        # The coupler's underside slopes at 45 degrees: the top prints standing
-        # up, and a square block would be a 3 mm ledge over air.
-        raised.append(side_prism('Coupler', [
-            (carX0 + 2.0, couplerZ0), (carX0, couplerZ0),
-            (carX0 - couplerProud, couplerZ0 + couplerProud),
-            (carX0 - couplerProud, couplerZ1), (carX0 + 2.0, couplerZ1)],
-            couplerHalfW))
         for k, sgn in enumerate((-1.0, 1.0)):
             raised.append(box_body('Light_{}'.format(k), carX0 - lightProud, carX0 + 1.5,
                                    sgn * lightY - lightHalfW, sgn * lightY + lightHalfW,
@@ -1330,13 +1357,12 @@ def run(context):
 
         raisedBefore = volume_mm3('Car')
         join_into('Car', raised)
-        # The lights are the only raised faces below the coupler on the tail.
+        # The lights are the only raised faces on the tail.
         paint_faces(lastFeature[0], 'black',
-                    lambda f: 'red' if (face_point(f)[0] < carX0 + 1.5
-                                        and face_point(f)[2] < couplerZ0 - 0.5) else 'black')
+                    lambda f: 'red' if face_point(f)[0] < carX0 + 1.5 else 'black')
         raisedAdded = volume_mm3('Car') - raisedBefore
         require(raisedAdded > 50.0,
-                'The frames, coupler and tail lights added only {:.0f} mm3.'.format(raisedAdded))
+                'The frames and tail lights added only {:.0f} mm3.'.format(raisedAdded))
         require(is_inside('Car', displayCentres[0], frameFaceY - 0.3, frameZ1 - 0.5),
                 'The cube frames are not standing on the display flank.')
 
@@ -1750,25 +1776,136 @@ def run(context):
                     and is_inside('Car_Top', 0.0, -(ribY - lipRib), stripeZ1 + seatDepth / 2.0),
                     'The red\'s rib does not sit in a groove behind a white lip.')
 
+            # The top comes apart along its colours too. First the frames: each
+            # is what of the top lies in its own box -- a cup round the slot,
+            # with the groove for the red's rib under it -- and the top keeps a
+            # pocket bigger by the fits. The pocket is open below, at the red, and
+            # above the band, so a cup drops in once the band is on and the
+            # roof closes over it.
+            topVolume = exact('Car_Top')
+            cupNames = ['Car_Frame_{}'.format(k + 1) for k in range(cubeN)]
+            for name, xc in zip(cupNames, displayCentres):
+                copyFeat = root.features.copyPasteBodies.add(body_named('Car_Top'))
+                require(copyFeat.bodies.count == 1,
+                        'Copying the top gave {} bodies.'.format(copyFeat.bodies.count))
+                copyFeat.bodies.item(0).name = name
+                cup = combine_bodies(name, [box_body(
+                    'Cup_' + name, xc - frameW / 2.0, xc + frameW / 2.0,
+                    slotFloorY - 1.0, frameFaceY + 1.0, frameZ0 - 1.0, frameZ1)],
+                    adsk.fusion.FeatureOperations.IntersectFeatureOperation)
+                require(len(cup) == 1, '{} came out in {} pieces.'.format(name, len(cup)))
+            cupVolume = sum(exact(n) for n in cupNames)
+            top = cut_from('Car_Top', [box_body(
+                'Pocket_' + name, xc - frameW / 2.0 - frameFit, xc + frameW / 2.0 + frameFit,
+                slotFloorY - 1.0 - frameFit, frameFaceY + 1.0, frameZ0 - 1.0,
+                frameZ1 + frameRoofFit)
+                for name, xc in zip(cupNames, displayCentres)])
+            require(len(top) == 1, 'The frames\' pockets cut the top into {} pieces.'
+                    .format(len(top)))
+            # What the pockets took beyond the cups is the clearance round them:
+            # no more than the fits over every face of every cup.
+            cupDepth = frameFaceY - slotFloorY + 1.0
+            cupSlack = (frameFit * (frameW + 2.0 * cupDepth) * (frameZ1 - frameZ0)
+                        + frameRoofFit * frameW * cupDepth)
+            pocketSlack = topVolume - exact('Car_Top') - cupVolume
+            require(0.0 < pocketSlack < 1.25 * cubeN * cupSlack,
+                    'The frames\' pockets took {:.0f} mm3 beyond the cups -- the clearance '
+                    'round them is wrong.'.format(pocketSlack))
+
+            # Then the layers, cut at the band's edges. The band ends short of
+            # the tail on a slant; the white behind it goes with the pinstripe.
+            topVolume = exact('Car_Top')
+            split_in_two('Car_Top', plane_at(bandZ0), 'z', 'Car_Pinstripe', 'Car_Upper')
+            split_in_two('Car_Upper', plane_at(bandZ1), 'z', 'Car_Band', 'Car_Roof')
+
+            def slant_x(z):
+                return bandTailBotX + (bandTailTopX - bandTailBotX) * (z - bandZ0) / (bandZ1 - bandZ0)
+            tailTool = side_prism('TailEnd', [
+                (backX, bandZ0 - 1.0), (slant_x(bandZ0 - 1.0), bandZ0 - 1.0),
+                (slant_x(bandZ1 + 1.0), bandZ1 + 1.0), (backX, bandZ1 + 1.0)],
+                carHalfW + liveryOver)
+            copyFeat = root.features.copyPasteBodies.add(body_named('Car_Band'))
+            require(copyFeat.bodies.count == 1,
+                    'Copying the band gave {} bodies.'.format(copyFeat.bodies.count))
+            copyFeat.bodies.item(0).name = 'Car_Tail_End'
+            combine_bodies('Car_Tail_End', [tailTool],
+                           adsk.fusion.FeatureOperations.IntersectFeatureOperation, True)
+            tailEnd = [b for b in root.bRepBodies
+                       if b.name == 'Car_Tail_End' or b.name.startswith('Car_Tail_End (')]
+            band = cut_from('Car_Band', [body_named(tailTool.name)])
+            require(len(tailEnd) == 1 and len(band) == 1,
+                    'Cutting the tail end off the band left {} tail and {} band pieces.'
+                    .format(len(tailEnd), len(band)))
+            join_into('Car_Pinstripe', tailEnd)
+            require(abs(exact('Car_Pinstripe') + exact('Car_Band') + exact('Car_Roof')
+                        - topVolume) < 1.0e-4 * topVolume,
+                    'Cutting the top into layers changed its volume.')
+
+            # Each layer is where it should be: the band set bandDepth in, the
+            # white standing proud below and above it, the white tail end behind
+            # the band's slant; each frame's walls in its cup, the clearance
+            # round it, white or black between the frames, and the roof over.
+            bandY = carHalfW - bandDepth
+            bandMidZ = (bandZ0 + bandZ1) / 2.0
+            require(is_inside('Car_Pinstripe', 0.0, -(carHalfW - 0.3), bandZ0 - 0.3)
+                    and is_inside('Car_Band', 0.0, -(bandY - 0.3), bandZ0 + 0.3)
+                    and is_outside('Car_Band', 0.0, -(bandY + 0.3), bandZ0 + 0.3)
+                    and is_outside('Car_Band', 0.0, -(bandY + 0.3), flatZ1 - 0.5)
+                    and is_inside('Car_Roof', 0.0, -(carHalfW - 1.0), bandZ1 + 0.3),
+                    'The top did not come apart at the band\'s edges.')
+            sx = slant_x(bandMidZ)
+            require(is_inside('Car_Pinstripe', sx - 0.5, -15.0, bandMidZ)
+                    and is_outside('Car_Band', sx - 0.5, -15.0, bandMidZ)
+                    and is_inside('Car_Band', sx + 0.5, -15.0, bandMidZ)
+                    and is_outside('Car_Pinstripe', sx + 0.5, -15.0, bandMidZ),
+                    'The white tail end did not go with the pinstripe.')
+            layers = ('Car_Pinstripe', 'Car_Band', 'Car_Roof')
+            for k, (name, xc) in enumerate(zip(cupNames, displayCentres)):
+                gapX = xc - frameW / 2.0 - frameFit / 2.0
+                require(is_inside(name, xc - slotW / 2.0 - frameWall / 2.0, 15.0, bandMidZ)
+                        and is_inside(name, xc, slotFloorY - 0.5, bandMidZ)
+                        and is_outside(name, xc, slotFloorY + 0.5, bandMidZ)
+                        and is_inside(name, xc, 15.0, frameZ1 - 0.5)
+                        and is_outside(name, xc, ribY, stripeZ1 + seatDepth / 2.0)
+                        and is_inside(name, xc, ribY, stripeZ1 + seatDepth + 0.3),
+                        '{} is not a cup round its slot, sitting on the red\'s rib.'.format(name))
+                require(all(is_outside(n, gapX, 15.0, z) for n in layers + (name,)
+                            for z in (bandZ0 - 3.0, bandMidZ, bandZ1 + 3.0))
+                        and is_outside('Car_Band', xc, slotFloorY - 1.0 - frameFit / 2.0, bandMidZ)
+                        and is_inside('Car_Band', xc, slotFloorY - 1.0 - frameFit - 0.5, bandMidZ)
+                        and is_outside('Car_Roof', xc, 10.0, frameZ1 + frameRoofFit - 0.05)
+                        and is_inside('Car_Roof', xc, 10.0, frameZ1 + frameRoofFit + 0.5),
+                        '{} has no clearance round it in its pocket.'.format(name))
+                if k < cubeN - 1:
+                    finX = xc + frameW / 2.0 + frameGap / 2.0
+                    require(is_inside('Car_Pinstripe', finX, 15.0, bandZ0 - 3.0)
+                            and is_inside('Car_Band', finX, 15.0, bandMidZ)
+                            and is_inside('Car_Roof', finX, 15.0, bandZ1 + 3.0),
+                            'There is no wall between {} and the next frame.'.format(name))
+
             split_in_two('Car_Red', root.xZConstructionPlane, 'y', 'Car_Red_Back', 'Car_Red_Display')
 
             # Every joint pinned: the red halves to each other, to the bottom and
-            # to the top.
+            # to the pinstripe, and the top's layers to each other.
             redHalves = ['Car_Red_Display', 'Car_Red_Back']
             pin_joint('Red', root.xZConstructionPlane, 'y', 0.0, ('x', 'z'),
                       RED_PIN_XZ, pinH, redHalves)
             pin_joint('Seat', root.xYConstructionPlane, 'z', seatJoint, ('x', 'y'),
                       SEAT_PIN_XY, pinH, redHalves + ['Car_Bottom'])
             pin_joint('Top', root.xYConstructionPlane, 'z', stripeZ1, ('x', 'y'),
-                      TOP_PIN_XY, pinH, redHalves + ['Car_Top'])
+                      TOP_PIN_XY, pinH, redHalves + ['Car_Pinstripe'])
+            pin_joint('Band', root.xYConstructionPlane, 'z', bandZ0, ('x', 'y'),
+                      BAND_PIN_XY, pinH, ['Car_Pinstripe', 'Car_Band'])
+            pin_joint('Roof', root.xYConstructionPlane, 'z', bandZ1, ('x', 'y'),
+                      BAND_PIN_XY, pinH, ['Car_Band', 'Car_Roof'])
             for px, pz in RED_PIN_XZ:
                 require(all(is_outside(n, px, sgn * pinH, pz) and
                             is_inside(n, px, sgn * (pinH + socketExtra + 0.5), pz)
                             for n, sgn in (('Car_Red_Display', 1.0), ('Car_Red_Back', -1.0))),
                         'The pin socket at x {:.0f} is not in both red halves.'.format(px))
             for pins, z, other in ((SEAT_PIN_XY, seatJoint, 'Car_Bottom'),
-                                   (TOP_PIN_XY, stripeZ1, 'Car_Top')):
-                up = 1.0 if other == 'Car_Top' else -1.0
+                                   (TOP_PIN_XY, stripeZ1, 'Car_Pinstripe')):
+                up = 1.0 if other == 'Car_Pinstripe' else -1.0
                 for (px, py) in pins:
                     redHalf = 'Car_Red_Display' if py > 0.0 else 'Car_Red_Back'
                     require(is_outside(redHalf, px, py, z - up * pinH)
@@ -1777,11 +1914,21 @@ def run(context):
                             and is_inside(other, px, py, z + up * (pinH + socketExtra + 0.5)),
                             'The pin socket at x {:.0f}, y {:.0f} is not in both the red and '
                             '{}.'.format(px, py, other))
+            for z, below, above in ((bandZ0, 'Car_Pinstripe', 'Car_Band'),
+                                    (bandZ1, 'Car_Band', 'Car_Roof')):
+                for (px, py) in BAND_PIN_XY:
+                    require(is_outside(below, px, py, z - pinH)
+                            and is_inside(below, px, py, z - (pinH + socketExtra + 0.5))
+                            and is_outside(above, px, py, z + pinH)
+                            and is_inside(above, px, py, z + (pinH + socketExtra + 0.5)),
+                            'The pin socket at x {:.0f}, y {:.0f}, z {:.0f} is not in both {} '
+                            'and {}.'.format(px, py, z, below, above))
 
             # Each part is where it should be: the bottom under the red's lower
             # edge, the red's tongue in the recess inside a white rim, on the flat
             # and halfway up the curve, where it stops at the spare pocket; the
-            # red halves either side of the middle, the top above the stripe.
+            # red halves either side of the middle, the top's layers above the
+            # stripe.
             tailX = carX0 + 2.0
             curveX = (carX0 + sweepX0) / 2.0
             for sx in (0.0, curveX):
@@ -1800,15 +1947,15 @@ def run(context):
                     and is_inside('Car_Red_Display', tailX, 15.0, red_floor(tailX) + 0.5)
                     and is_inside('Car_Red_Display', 0.0, 3.0, (stripeZ0 + stripeZ1) / 2.0)
                     and is_inside('Car_Red_Back', 0.0, -3.0, (stripeZ0 + stripeZ1) / 2.0)
-                    and is_inside('Car_Top', 0.0, -15.0, stripeZ1 + 0.5)
-                    and is_inside('Car_Top', 0.0, -15.0, bodyZ1 - 2.0),
+                    and is_inside('Car_Pinstripe', 0.0, -15.0, stripeZ1 + 0.5)
+                    and is_inside('Car_Roof', 0.0, -15.0, bodyZ1 - 2.0),
                     'The car did not come apart along the red stripe as it should.')
 
             # Colours per part. The bottom is white throughout: its top took the
             # stripe's steps, painted red, with it. A red half is red all over but
-            # the letter tops, which go gold at the end. The top's underside is
-            # white, and black under the frames: in print the first layer takes
-            # the colour of the face on the bed, whatever the walls above it are.
+            # the letter tops, which go gold at the end. The top's parts are each
+            # one colour, all over, every face: the windshield stays its own
+            # shade only so it shows in Fusion.
             if PREVIEW_COLOURS:
                 try:
                     bottomBody = body_named('Car_Bottom')
@@ -1824,29 +1971,18 @@ def run(context):
                                     adsk.core.AppearanceSourceTypes.OverrideAppearanceSource
                                     and f.appearance.name != paint('red').name):
                                 f.appearance = paint('red')
-
-                    def top_underside():
-                        top = body_named('Car_Top')
-                        out = []
-                        for i in range(top.faces.count):
-                            f = top.faces.item(i)
-                            bb = f.boundingBox
-                            if max(abs(bb.minPoint.z * 10.0 - stripeZ1),
-                                   abs(bb.maxPoint.z * 10.0 - stripeZ1)) < 0.01:
-                                out.append(f)
-                        return out
-                    feet = adsk.core.ObjectCollection.create()
-                    for f in top_underside():
-                        feet.add(f)
-                    sfi = root.features.splitFaceFeatures.createInput(
-                        feet, plane_through('Cut_P_FrameFeet', root.xZConstructionPlane,
-                                            'y', carHalfW + 0.1), True)
-                    root.features.splitFaceFeatures.add(sfi)
-                    for f in top_underside():
-                        f.appearance = paint('black' if face_point(f)[1] > carHalfW else 'white')
+                    for n, colour in ([('Car_Pinstripe', 'white'), ('Car_Band', 'black'),
+                                       ('Car_Roof', 'white')] + [(n, 'black') for n in cupNames]):
+                        b = body_named(n)
+                        b.appearance = paint(colour)
+                        for i in range(b.faces.count):
+                            f = b.faces.item(i)
+                            if f.appearance.name != paint('glass').name:
+                                f.appearance = paint(colour)
                 except Exception as ex:
                     paintTrouble.append('parts: {}'.format(ex))
-            CAR_BODIES = ['Car_Bottom', 'Car_Red_Display', 'Car_Red_Back', 'Car_Top']
+            CAR_BODIES = (['Car_Bottom', 'Car_Red_Display', 'Car_Red_Back',
+                           'Car_Pinstripe', 'Car_Band', 'Car_Roof'] + cupNames)
         else:
             CAR_BODIES = ['Car']
 
@@ -2216,16 +2352,20 @@ def run(context):
                 pass
 
         if SPLIT_CAR:
-            partsLine = ('Car in four parts along the red stripe: bottom {:.1f}, red halves '
-                         '{:.1f} and {:.1f}, top {:.1f} cm3. The red stands {:.1f} mm down '
+            partsLine = ('Car in nine parts along its colours: bottom {:.1f}, red halves '
+                         '{:.1f} and {:.1f}, pinstripe {:.1f}, band {:.1f}, roof {:.1f}, frames '
+                         '{:.1f}, {:.1f} and {:.1f} cm3. The red stands {:.1f} mm down '
                          'into the bottom, tail to nose, with {:.1f} mm a side, and its '
-                         '{:.1f} mm rib {:.1f} mm up into a groove behind the top\'s lip.\n'
+                         '{:.1f} mm rib {:.1f} mm up into a groove behind the pinstripe\'s lip. '
+                         'The band is cut at z {:.0f} and {:.0f}, and the frames stand in '
+                         'pockets with {:.1f} mm a side and {:.1f} mm under the roof.\n'
                          'Pins on every joint: {} between the red halves, {} to the bottom, {} to '
-                         'the top, {} to the beam; {} in all.\n'
+                         'the pinstripe, {} on each edge of the band, {} to the beam; {} in all.\n'
                          .format(*([volume_mm3(n) / 1000.0 for n in CAR_BODIES]
-                                   + [seatDepth, seatGap, lipRib, seatDepth,
-                                      len(RED_PIN_XZ), len(SEAT_PIN_XY), len(TOP_PIN_XY),
-                                      len(BEAM_PIN_X), len(PIN_BODIES)])))
+                                   + [seatDepth, seatGap, lipRib, seatDepth, bandZ0, bandZ1,
+                                      frameFit, frameRoofFit, len(RED_PIN_XZ), len(SEAT_PIN_XY),
+                                      len(TOP_PIN_XY), len(BAND_PIN_XY), len(BEAM_PIN_X),
+                                      len(PIN_BODIES)])))
         else:
             partsLine = 'Car in one piece.\n'
         ui.messageBox('Built.\n\n'
@@ -2261,8 +2401,9 @@ def run(context):
                       'Preview colours: {}.\n\n'
                       'Print the car bottom belly down, all white, with support under '
                       'the nose; the red halves on their cut faces, red with gold '
-                      'lettering, with support at the tail; the top standing on its '
-                      'flat bottom, white and black; the pins on end; the beam on its '
+                      'lettering, with support at the tail; the pinstripe, band and roof '
+                      'flat, white, black and white; the frames on their backs, black; the '
+                      'pins on end; the beam on its '
                       'side; the foot flat. Beam and foot grey. Glue every joint, the car '
                       'to the beam too.'
                       .format('PER SIDE' if SYMMETRIC_PER_SIDE else 'TOTAL',

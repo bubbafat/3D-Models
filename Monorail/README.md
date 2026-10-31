@@ -36,19 +36,24 @@ python3 send.py run "/path/to/Monorail Countdown.py"
 
 ## What it makes
 
-Twenty-three bodies, 176.6 × 56 × 76 mm assembled.
+Thirty-six bodies, 175.6 × 56 × 76 mm assembled.
 
-![The car's four parts and the beam, pulled apart, with their pins](render-parts.png)
+![The car's nine parts and the beam, pulled apart, with their pins](render-parts.png)
 
 | Body | What it is | Print it |
 |---|---|---|
 | `Car_Bottom` | The white belly, up to the red stripe | Belly down |
 | `Car_Red_Display` | The display half of the red stripe, with the lettering | On its cut face |
 | `Car_Red_Back` | The back half of the red stripe | On its cut face |
-| `Car_Top` | White, the black band and frames, white roof, with the cube slots | Standing on its flat bottom |
+| `Car_Pinstripe` | The white strip over the red, and the white tail end | Flat |
+| `Car_Band` | The black window band, with the windshield | Flat |
+| `Car_Roof` | The white roof | Flat |
+| `Car_Frame_1`–`3` | The black cube frames, each a cup round its slot | On its back |
 | `Pin_Red_1`–`2` | Loose pins between the red halves | Standing on end |
 | `Pin_Seat_1`–`4` | Loose pins between the red halves and the bottom | Standing on end |
-| `Pin_Top_1`–`4` | Loose pins between the red halves and the top | Standing on end |
+| `Pin_Top_1`–`4` | Loose pins between the red halves and the pinstripe | Standing on end |
+| `Pin_Band_1`–`4` | Loose pins between the pinstripe and the band | Standing on end |
+| `Pin_Roof_1`–`4` | Loose pins between the band and the roof | Standing on end |
 | `Pin_Beam_1`–`3` | Loose pins, 10 mm long, between the beam and the car | Standing on end |
 | `Beam` | The beam and both pylons, one piece | On its side |
 | `Foot` | The plate the pylons plug into | Flat |
@@ -56,38 +61,48 @@ Twenty-three bodies, 176.6 × 56 × 76 mm assembled.
 | `Cube_4_Spare` | The fourth cube, kept in the tail | A digit face down |
 
 The car is cut where its colours meet, like the ship's hull and
-superstructure, so each part prints in one colour or close to it:
+superstructure, so every part prints in one colour but the red halves, whose
+lettering is gold:
 
 - **The bottom** is all white. Printed belly down, the beam channel is a
   bridge; the nose's underside, which curves up off the bed, is supported.
 - **The red stripe** is cut down the middle. Each half lies on its cut face, so
   the gold lettering, which stands on the red, is only the last few layers.
-- **The top** prints standing up, so the black band, frames and windshield are
-  upright walls, and the cube slots and the spare pocket's roof are bridges.
-  The coupler's underside slopes at 45° so it needs no support.
+- **The top** is three layers cut at the window band's edges: the white
+  pinstripe, the black band with the windshield, and the white roof. Each
+  prints flat. The band stops short of the tail on a slant, so the white tail
+  end behind it goes with the pinstripe.
+- **The cube frames** are black cups, each with its cube slot inside, that
+  print on their backs and stand in pockets through all three layers.
 
 The red stripe is set 0.8 mm into the body, so the bottom's top face has a
 ledge round it, as the ship's deck does round its superstructure. Like the
 ship, it carries a 0.4 mm locating recess, with 0.1 mm clearance a side, that
 both red halves stand in, so a white rim hides the joint, from the tail face,
-up the curve of the red's lower edge, to the nose. The top hides its
-joint the same way: a white lip 0.4 mm deep covers the red's top edge. The top
-prints standing on its underside, where a recess the width of the red would be
+up the curve of the red's lower edge, to the nose. The pinstripe hides its
+joint the same way: a white lip 0.4 mm deep covers the red's top edge. The
+pinstripe prints on its underside, where a recess the width of the red would be
 a bridge just off the bed, so the red carries a 1.2 mm rib along its edge
 instead, which fits a groove behind the lip.
 
+The top's own joints need no lip. They are at the band's edges, where the
+white already stands 0.6 mm proud of the black, so a gap there sits against
+black. Each frame has 0.1 mm of clearance a side in its pocket and 0.3 mm
+under the roof, whose pocket ceiling is a bridge and may sag.
+
 Every joint is pinned, with loose pins in sockets in both parts, so every part
 still lies flat on the bed: two between the red halves, two from each red half
-to the bottom, two to the top, and three, 10 mm long, from the beam into the
-belly. The beam's top runs 5 mm up into the belly, so the channel's sides can
-be glued as well.
+to the bottom and two to the pinstripe, four under the band and four under the
+roof, and three, 10 mm long, from the beam into the belly. The beam's top runs
+5 mm up into the belly, so the channel's sides can be glued as well. The
+frames have no pins: each pocket holds its frame on every side but the front.
 
 ## Colours
 
 | Filament | What |
 |---|---|
 | 1 white | The car's body, the pins, the cubes |
-| 2 black | Window band, cube frames, tail coupler, windshield, the cube digits |
+| 2 black | Window band, cube frames, windshield, the cube digits |
 | 3 red | Stripe, tail lights |
 | 4 gold | Lettering |
 | 5 grey | Beam and foot |
@@ -116,28 +131,29 @@ was too flexible and let light through the white. One car:
 
 | Plate | Time | Filament changes | Filament |
 |---|---|---|---|
-| Car bottom and pins | 3.1 h | 56 | 46 g, and 8 g PETG |
-| Car red halves | 1.6 h | 3 | 46 g |
-| Car top | 6.4 h | 122 | 132 g |
+| Car bottom and pins | 3.2 h | 56 | 46 g, and 8 g PETG |
+| Car red halves | 1.6 h | 3 | 47 g |
+| Car top, white: pinstripe and roof | 1.4 h | 0 | 45 g |
+| Car top, black: band and frames | 1.2 h | 0 | 40 g |
 | Beam and foot | 1.2 h | 0 | 40 g |
 | Cubes (optional) | 3.8 h | 70 | 65 g |
 
 The red plate barely changes colour: the red ends at the stripe's floor and
-the letters stand on it, so everything above is gold. The top's changes come
-from the black band and frames, which are in every layer from its bottom to
-24 mm up, and the bottom's from the PETG under its nose. The changes are paid
-per layer, not per part, so batches share them. Per car, measured on full
-plates:
+the letters stand on it, so everything above is gold. The bottom's changes
+come from the PETG under its nose. The changes are paid per layer, not per
+part, so batches share them. Per car, measured on full plates:
 
 | Batch | Per car |
 |---|---|
 | 4 bottoms a plate | 1.7 h, 41 g with the PETG, 14 changes |
 | 5 pairs of red halves a plate | 1.3 h, 42 g |
-| 4 tops a plate | 2.9 h, 80 g, 31 changes |
 
-That is about 5.9 h and 163 g a car, pins aside. The earlier car, in two
-halves, took 9.8 h and 168 g printed one to a plate at 8% lightning; it was
-not measured in batches.
+The top's two plates change colour nowhere, so a top costs 2.6 h and 85 g in
+any batch. Printed in one piece, white and black, it took 6.4 h and 132 g on
+its own and 2.9 h and 80 g a car four to a plate, where the purge went into
+the infill. Cut into layers it needs no purge, but every new joint face is a
+solid skin, which costs about as much. So a car is about 5.6 h and 168 g,
+pins aside.
 
 **Supports.** The bottom is supported under the nose, and each red half under
 its tail end, which overhangs the spare pocket. Nothing else is: the beam
@@ -153,14 +169,16 @@ nose's underside meets its supports at almost every height.
 curves away from the flank near the top of the print. The nose's width narrows
 on a gentler curve than its height, so it leaves the flank more steeply: at
 0.2 mm layers the first steps there are 1.9, 1.5 and 1.3 mm wide, where they
-were 7.1, 2.3 and 1.8 mm. The top prints standing up, so its nose is an
-upright wall.
+were 7.1, 2.3 and 1.8 mm. The top's layers print flat, the way the top did in
+one piece, so its nose steps as it did before.
 
 **Assembly.** Pin and glue the red halves to each other first, so they line
 up before they meet anything else. Then pin and glue them into the bottom's
-recess, and pin and glue the top on. Glue the pylons into the foot. Last, push
-the beam's pins into the beam, and glue the car onto them and along the
-channel's sides.
+recess. Pin and glue the pinstripe on the red, and the band on the pinstripe.
+Drop the three frames into their pockets from above; each sits on the red's
+rib. Then pin and glue the roof on over them. Glue the pylons into the foot.
+Last, push the beam's pins into the beam, and glue the car onto them and along
+the channel's sides.
 
 ## The cubes
 
@@ -187,7 +205,7 @@ script re-proves all 366 counts every time it runs.
 ## Changing it
 
 The settings are at the top of the script: the lettering (`CAR_TEXT`), the
-fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `beamFit`, `seatGap`, `pinFit`, `socketFit`),
+fonts (`DIGIT_FONTS`, `TEXT_FONTS`), the fits (`cubeClearance`, `spareClearance`, `beamFit`, `seatGap`, `frameFit`, `frameRoofFit`, `pinFit`, `socketFit`),
 `PREVIEW_COLOURS`, and `SPLIT_CAR` to build the car as one piece. Every layout
 rule is checked before anything is built, and again with measurements after:
 if a change makes two features collide, the script stops and says which, rather
@@ -211,3 +229,9 @@ An all-white print of that version fitted together, and the rim hid the
 bottom joint along the flat run. On the curve up to the tail the joint showed
 as a dark line, because the rim stopped where the curve began. The rim now
 runs the whole length; that has not been printed yet.
+
+The top used to print in one piece, white and black, with a colour change in
+nearly every layer: 122 a car, about 4.6 h and 70 g of it. It is now cut at
+the band's edges into single-colour layers, with the frames separate, and the
+black coupler that stood on the tail face is gone. That is not printed yet
+either.

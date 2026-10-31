@@ -6,7 +6,7 @@ slicer:
 - painted in the model's four colours;
 - each part turned to its print orientation;
 - supports painted on exactly where they are needed;
-- laid out on five plates, in one project;
+- laid out on six plates, in one project;
 - sliced, with time, filament changes and grams reported.
 
 Without it you would paint every part by hand in Bambu Studio. Fusion's 3MF
@@ -52,11 +52,12 @@ filament 1, and 6 PETG, if you gave a PETG project. Of those, each plate uses:
 
 | Plate | On its own | Parts | Uses |
 |---|---|---|---|
-| 1 Car Bottom | `Monorail - car bottom.3mf` | The car's bottom and all thirteen pins | 1 white, 6 PETG |
+| 1 Car Bottom | `Monorail - car bottom.3mf` | The car's bottom and all twenty-one pins | 1 white, 6 PETG |
 | 2 Car Red | `Monorail - car red.3mf` | The two red halves | 3 red, 4 gold, 6 PETG |
-| 3 Car Top | `Monorail - car top.3mf` | The car's top | 1 white, 2 black |
-| 4 Beam Plate | `Monorail - beam plate.3mf` | Beam and foot | 5 grey |
-| 5 Cubes | `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
+| 3 Car Top White | `Monorail - car top white.3mf` | The pinstripe and the roof | 1 white |
+| 4 Car Top Black | `Monorail - car top black.3mf` | The window band and the three frames | 2 black |
+| 5 Beam Plate | `Monorail - beam plate.3mf` | Beam and foot | 5 grey |
+| 6 Cubes | `Monorail - cubes.3mf` | The four cubes | 1 white, 2 black |
 
 When you print a plate, map the filaments it uses to your AMS. Each plate is
 one car. To print a batch, add copies of the part in Bambu Studio; the paint
@@ -85,7 +86,7 @@ changes, hours, minutes of flushing, and grams by filament.
    which supports the painted faces and nothing else; with the PETG, its
    interface is PETG, with no gap, and that plate stops flushing into the
    parts' infill, so no PETG ends up inside a PLA part.
-6. `one_project.py` merges the five into `Monorail.3mf`, and Bambu Studio's
+6. `one_project.py` merges the six into `Monorail.3mf`, and Bambu Studio's
    command line slices it, every plate, and reports.
 
 ## What Bambu Studio does that you need to know
@@ -161,5 +162,6 @@ model. It was worked out by testing against Bambu Studio 2.07.
   renumbering them and their mesh files.
 - **Check by slicing.** `BambuStudio --slice 0 --outputdir <absolute folder>
   <project.3mf>` writes `result.json`, with `filament_change_times`,
-  `total_predication` (seconds) and grams per filament. If the car red or car
-  top plate shows 0 filament changes, the paint was lost.
+  `total_predication` (seconds) and grams per filament. If the car red plate
+  shows 0 filament changes, or the car top black plate uses any filament but
+  2, the paint was lost.

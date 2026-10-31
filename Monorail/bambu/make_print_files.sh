@@ -36,12 +36,13 @@ mkdir -p "$WORK/ref"
     --export-3mf "ref.3mf" "$WORK/plates/Monorail - beam plate.3mf" > /dev/null 2>&1)
 python3 -I "$HERE/filaments.py" "$SETTINGS" "$WORK/ref/ref.3mf" "$WORK/settings.3mf" $PETG
 # plate name : filaments for the first pass : your four filaments' colours in
-# the finished project. The car is in three plates by colour: the white bottom
-# with the pins, the red halves with their gold lettering, and the white and
-# black top.
+# the finished project. The car is in four plates by colour: the white bottom
+# with the pins, the red halves with their gold lettering, the top's white
+# pinstripe and roof, and its black band and frames.
 CAR="#FFFFFF,#161616,#C12E1F,#FFF144"
 PLATES=()
-for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top:2:$CAR" "beam plate:1:$CAR" "cubes:2:$CAR"; do
+for spec in "car bottom:1:$CAR" "car red:4:$CAR" "car top white:1:$CAR" "car top black:1:$CAR" \
+    "beam plate:1:$CAR" "cubes:2:$CAR"; do
   name="${spec%%:*}"; rest="${spec#*:}"; n="${rest%%:*}"; cols="${rest#*:}"
   fils=$(python3 -c "print(';'.join(['$FI']*$n))")
   rm -rf "$WORK/proj"; mkdir -p "$WORK/proj"
