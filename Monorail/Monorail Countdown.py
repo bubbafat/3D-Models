@@ -333,15 +333,15 @@ def run(context):
         # Where the parts meet. The red stripe is set stripeDepth into the body,
         # so the bottom's top face has a ledge round it, like the ship's deck
         # round its superstructure, with room for the ship's locating recess:
-        # the red halves stand seatDepth down into it, along the flat run from
-        # seatX0 to the nose. Behind that the red's lower edge sweeps up, and
-        # the curve itself locates them.
+        # the red halves stand seatDepth down into it from the tail to the nose,
+        # up the curve too, so a white rim stands in front of the joint all the
+        # way. Where the recess stopped short of the curve, the first prints
+        # showed the joint there as a dark line.
         # The top gets the same white lip over the red, seatDepth deep. It
         # prints standing on its underside, where a recess the width of the red
         # would be a bridge just off the bed, so the red carries a rib, lipRib
         # wide, along its edge, and the top a groove behind the lip for it.
         seatDepth, seatGap = 0.4, 0.1
-        seatX0 = sweepX0 + 3.0
         lipRib = 1.2
         # Every joint is pinned: loose pins in sockets in both parts, so every
         # part lies flat on the bed. Standing on end at these (x, y) across the
@@ -574,9 +574,9 @@ def run(context):
             u = min(1.0, (sweepX0 - x) / (sweepX0 - carX0))
             return stripeZ0 + (sweepZ - stripeZ0) * u * u * (3.0 - 2.0 * u)
 
-        require(seatX0 > carX0 + spareDepth + 2.0 and seatX0 < arrayX0,
-                'The seat for the red halves starts at x {:.1f}, in the spare pocket or '
-                'past the cubes.'.format(seatX0))
+        require(red_floor(carX0 + spareDepth) - seatDepth > spareZ0 + 1.0,
+                'The seat for the red halves comes within 1 mm of the spare pocket\'s '
+                'floor.')
         require(stripeDepth - seatGap >= 0.6,
                 'The rim round the red halves\' seat is {:.2f} mm wide -- too thin to '
                 'print.'.format(stripeDepth - seatGap))
@@ -614,9 +614,9 @@ def run(context):
                     and abs(py) - socketR > channelHalfW + 1.5,
                     'The seat pin at x {:.0f}, y {:.0f} runs into the lettering or the beam '
                     'channel.'.format(px, py))
-            require(px - socketR > seatX0 + seatGap and zHi < stripeZ1 - pinH - socketExtra - 1.0,
-                    'The seat pin at x {:.0f} is off the seat, or meets the top\'s pins.'
-                    .format(px))
+            require(px - socketR > sweepX0 and zHi < stripeZ1 - pinH - socketExtra - 1.0,
+                    'The seat pin at x {:.0f} is on the curve, where the seat is not at z '
+                    '{:.1f}, or meets the top\'s pins.'.format(px, seatJoint))
         for (px, pz) in RED_PIN_XZ:
             sec = section_at(px)
             require(pz - socketR > max(stripeZ0, red_floor(px)) + 1.0
@@ -1669,14 +1669,24 @@ def run(context):
                     'Cutting the red from the bottom changed their volume.')
 
             # The seat: the red halves stand seatDepth down into a recess in the
-            # bottom's top face. Both are the car rebuilt inset -- by the stripe
-            # depth for the red's own floor, and by seatGap less for the recess --
-            # so they follow the flank, the nose and the rounds alike.
+            # bottom's top face, tail to nose. Both are the car rebuilt inset --
+            # by the stripe depth for the red's own floor, and by seatGap less for
+            # the recess -- so they follow the flank, the nose and the rounds
+            # alike, cut to the red's lower edge let down seatDepth: the same
+            # curve, through the same points moved down. The tongue stops at the
+            # spare pocket.
+            under = [(x, z - seatDepth) for x, z in sweepFit]
             build_car('Inner_Tongue', stripeDepth)
-            tongue = combine_bodies('Inner_Tongue', [box_body(
-                'TongueSlab', seatX0 + seatGap, frontX, -carHalfW - 2.0, carHalfW + 2.0,
-                stripeZ0 - seatDepth, stripeZ0)],
+            tongue = combine_bodies('Inner_Tongue', [side_prism('TongueSlab', [
+                (backX, sweepZ), (carX0, sweepZ), (sweepX0, stripeZ0), (frontX, stripeZ0),
+                (frontX, stripeZ0 - seatDepth), (sweepX0, stripeZ0 - seatDepth),
+                (carX0, sweepZ - seatDepth), (backX, sweepZ - seatDepth)],
+                carHalfW + liveryOver, {1: sweepFit, 5: under[::-1]})],
                 adsk.fusion.FeatureOperations.IntersectFeatureOperation)
+            require(len(tongue) == 1, 'The tongue came out in {} pieces.'.format(len(tongue)))
+            tongue = cut_from(tongue[0].name, [box_body(
+                'TonguePocket', backX, carX0 + spareDepth,
+                -sparePocketSize / 2.0, sparePocketSize / 2.0, spareZ0, spareZ1)])
             tongueVolume = sum(exact_mm3(b) for b in tongue)
             before = exact('Car_Red')
             join_into('Car_Red', tongue)
@@ -1684,9 +1694,11 @@ def run(context):
                     and tongueVolume > 1000.0,
                     'The red\'s {:.0f} mm3 tongue did not join on cleanly.'.format(tongueVolume))
             build_car('Inner_Seat', stripeDepth - seatGap)
-            seat = combine_bodies('Inner_Seat', [box_body(
-                'SeatSlab', seatX0, frontX, -carHalfW - 2.0, carHalfW + 2.0,
-                stripeZ0 - seatDepth, stripeZ0 + 1.0)],
+            seat = combine_bodies('Inner_Seat', [side_prism('SeatSlab', [
+                (backX, sweepZ - seatDepth), (carX0, sweepZ - seatDepth),
+                (sweepX0, stripeZ0 - seatDepth), (frontX, stripeZ0 - seatDepth),
+                (frontX, stripeZ1 + 5.0), (backX, stripeZ1 + 5.0)],
+                carHalfW + liveryOver, {1: under})],
                 adsk.fusion.FeatureOperations.IntersectFeatureOperation)
             before = exact('Car_Bottom')
             cut_from('Car_Bottom', seat)
@@ -1767,17 +1779,24 @@ def run(context):
                             '{}.'.format(px, py, other))
 
             # Each part is where it should be: the bottom under the red's lower
-            # edge, the red's tongue in the recess inside a white rim, the red
-            # halves either side of the middle, the top above the stripe.
+            # edge, the red's tongue in the recess inside a white rim, on the flat
+            # and halfway up the curve, where it stops at the spare pocket; the
+            # red halves either side of the middle, the top above the stripe.
             tailX = carX0 + 2.0
-            require(is_inside('Car_Bottom', 0.0, 15.0, stripeZ0 - seatDepth - 0.2)
-                    and is_outside('Car_Bottom', 0.0, 15.0, stripeZ0 - seatDepth / 2.0)
-                    and is_inside('Car_Red_Display', 0.0, 15.0, stripeZ0 - seatDepth / 2.0)
-                    and is_inside('Car_Red_Back', 0.0, -15.0, stripeZ0 - seatDepth / 2.0)
-                    and is_inside('Car_Bottom', 0.0, carHalfW - 0.3, stripeZ0 - seatDepth / 2.0)
-                    and is_inside('Car_Bottom', 0.0, -(carHalfW - 0.3), stripeZ0 - seatDepth / 2.0),
-                    'The red halves do not stand in a recess inside a white rim.')
-            require(is_inside('Car_Bottom', tailX, 15.0, red_floor(tailX) - 0.5)
+            curveX = (carX0 + sweepX0) / 2.0
+            for sx in (0.0, curveX):
+                sz = red_floor(sx) - seatDepth / 2.0
+                require(is_inside('Car_Bottom', sx, 15.0, sz - seatDepth / 2.0 - 0.2)
+                        and is_outside('Car_Bottom', sx, 15.0, sz)
+                        and is_inside('Car_Red_Display', sx, 15.0, sz)
+                        and is_inside('Car_Red_Back', sx, -15.0, sz)
+                        and is_inside('Car_Bottom', sx, carHalfW - 0.3, sz)
+                        and is_inside('Car_Bottom', sx, -(carHalfW - 0.3), sz),
+                        'At x {:.0f} the red halves do not stand in a recess inside a white '
+                        'rim.'.format(sx))
+            require(is_outside('Car_Red_Display', curveX, 1.0, red_floor(curveX) - seatDepth / 2.0),
+                    'The red\'s tongue runs into the spare pocket.')
+            require(is_inside('Car_Bottom', tailX, 15.0, red_floor(tailX) - seatDepth - 0.3)
                     and is_inside('Car_Red_Display', tailX, 15.0, red_floor(tailX) + 0.5)
                     and is_inside('Car_Red_Display', 0.0, 3.0, (stripeZ0 + stripeZ1) / 2.0)
                     and is_inside('Car_Red_Back', 0.0, -3.0, (stripeZ0 + stripeZ1) / 2.0)
@@ -2199,8 +2218,8 @@ def run(context):
         if SPLIT_CAR:
             partsLine = ('Car in four parts along the red stripe: bottom {:.1f}, red halves '
                          '{:.1f} and {:.1f}, top {:.1f} cm3. The red stands {:.1f} mm down '
-                         'into the bottom with {:.1f} mm a side, and its {:.1f} mm rib {:.1f} mm '
-                         'up into a groove behind the top\'s lip.\n'
+                         'into the bottom, tail to nose, with {:.1f} mm a side, and its '
+                         '{:.1f} mm rib {:.1f} mm up into a groove behind the top\'s lip.\n'
                          'Pins on every joint: {} between the red halves, {} to the bottom, {} to '
                          'the top, {} to the beam; {} in all.\n'
                          .format(*([volume_mm3(n) / 1000.0 for n in CAR_BODIES]

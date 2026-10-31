@@ -69,7 +69,8 @@ superstructure, so each part prints in one colour or close to it:
 The red stripe is set 0.8 mm into the body, so the bottom's top face has a
 ledge round it, as the ship's deck does round its superstructure. Like the
 ship, it carries a 0.4 mm locating recess, with 0.1 mm clearance a side, that
-both red halves stand in, so a white rim hides the joint. The top hides its
+both red halves stand in, so a white rim hides the joint, from the tail face,
+up the curve of the red's lower edge, to the nose. The top hides its
 joint the same way: a white lip 0.4 mm deep covers the red's top edge. The top
 prints standing on its underside, where a recess the width of the red would be
 a bridge just off the bed, so the red carries a 1.2 mm rib along its edge
@@ -204,5 +205,9 @@ unpainted cut face. That led to cutting the car along its colours instead.
 A dry fit of that, at 8% lightning, sat loosely on the beam and showed gaps
 at the joints, and the white was flexible and let light through. Since then
 every joint is pinned, the car sits deeper on the beam, the top's joint has a
-lip like the bottom's, and the infill is 15% gyroid with 4 walls. That version
-has not been printed yet.
+lip like the bottom's, and the infill is 15% gyroid with 4 walls.
+
+An all-white print of that version fitted together, and the rim hid the
+bottom joint along the flat run. On the curve up to the tail the joint showed
+as a dark line, because the rim stopped where the curve began. The rim now
+runs the whole length; that has not been printed yet.
