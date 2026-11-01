@@ -210,4 +210,4 @@ lip like the bottom's, and the infill is 15% gyroid with 4 walls.
 An all-white print of that version fitted together, and the rim hid the
 bottom joint along the flat run. On the curve up to the tail the joint showed
 as a dark line, because the rim stopped where the curve began. The rim now
-runs the whole length; that has not been printed yet.
+runs the whole length, and the next print showed no line anywhere along it.
