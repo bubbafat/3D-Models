@@ -5,7 +5,7 @@ TriangleSelector bitstream for an unsplit triangle in state s, as hex --
 s=1 "4", s=2 "8", s>=3 "{s-3:X}C". State s means filament s; unpainted
 triangles take the object's own filament (1).
 """
-import sys, os, zipfile, collections
+import sys, os, math, zipfile, collections
 import xml.etree.ElementTree as ET
 
 src, outdir = sys.argv[1], sys.argv[2]
@@ -13,7 +13,7 @@ NS = {'c': 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02',
       'm': 'http://schemas.microsoft.com/3dmanufacturing/material/2015/02'}
 
 FILAMENT = {'#EEEEE8': 1, '#1C1C20': 2, '#30343A': 2, '#BE1C22': 3, '#EEB228': 4,
-            '#96989E': 1, '#A0A0A0': 1}
+            '#96989E': 5, '#A0A0A0': 5}      # grey is filament 5: see filaments.py
 
 def paint_code(s):
     return {1: '4', 2: '8'}.get(s) or '{:X}C'.format(s - 3)
@@ -22,15 +22,28 @@ def paint_code(s):
 FLAT_ON_MINUS_Y = lambda x, y, z: (x, -z, y)    # +90 about x: the -y face goes down
 FLAT_ON_PLUS_Y = lambda x, y, z: (x, z, -y)     # -90 about x: the +y face goes down
 AS_IS = lambda x, y, z: (x, y, z)
-ORIENT = {'Car_Display': FLAT_ON_MINUS_Y, 'Car_Back': FLAT_ON_PLUS_Y,
-          'Pin_1': FLAT_ON_MINUS_Y, 'Pin_2': FLAT_ON_MINUS_Y, 'Pin_3': FLAT_ON_MINUS_Y,
+ORIENT = {'Car_Bottom': AS_IS, 'Car_Top': AS_IS,
+          'Car_Red_Display': FLAT_ON_MINUS_Y, 'Car_Red_Back': FLAT_ON_PLUS_Y,
           'Beam': FLAT_ON_MINUS_Y, 'Foot': AS_IS,
           'Cube_1': AS_IS, 'Cube_2': AS_IS, 'Cube_3': AS_IS, 'Cube_4_Spare': AS_IS}
+# The pins stand on end: the ones between the red halves lie across y in the
+# model, the rest stand up already.
+PIN_ORIENT = {'Pin_Red_': FLAT_ON_MINUS_Y}
 
-# Plates: (file name, [(body, front-left corner x, y on a 256 mm bed)]).
+
+def orient(name):
+    if name.startswith('Pin_'):
+        return next((f for k, f in PIN_ORIENT.items() if name.startswith(k)), AS_IS)
+    return ORIENT[name]
+
+
+# Plates: (file name, [(body, front-left corner x, y on a 256 mm bed)]). The car
+# goes by colour: the white bottom with all the pins, the red halves, the top.
+# 'Pin_*' is every pin, in a row from there.
 PLATES = [
-    ('Monorail - car plate.3mf', [('Car_Display', 40, 12), ('Car_Back', 40, 75),
-                                  ('Pin_1', 60, 140), ('Pin_2', 75, 140), ('Pin_3', 90, 140)]),
+    ('Monorail - car bottom.3mf', [('Car_Bottom', 40, 60), ('Pin_*', 40, 140)]),
+    ('Monorail - car red.3mf', [('Car_Red_Display', 40, 60), ('Car_Red_Back', 40, 110)]),
+    ('Monorail - car top.3mf', [('Car_Top', 40, 60)]),
     ('Monorail - beam plate.3mf', [('Beam', 44, 30), ('Foot', 63, 90)]),
     ('Monorail - cubes.3mf', [('Cube_1', 70, 100), ('Cube_2', 100, 100),
                               ('Cube_3', 130, 100), ('Cube_4_Spare', 160, 100)]),
@@ -82,14 +95,54 @@ groups = {}
 for g in root.iter('{%s}colorgroup' % NS['m']):
     groups[g.get('id')] = [c.get('color')[:7].upper() for c in g.findall('m:color', NS)]
 
+# Supports are painted on too, per triangle (Bambu's paint_supports, the same
+# code with 1 an enforcer), and the projects support only what is painted.
+# Left to itself Bambu also filled the beam channel and the cube slots, bridges
+# that print fine and that support would be hard to clear out of. In model mm,
+# from Monorail Countdown.py:
+#   Car_Bottom  the nose's underside, which lifts off the bed as it curves up
+#               to the tip -- but not the beam channel down the middle
+#   Car_Red_*   the tail end over the spare pocket, which overhangs the cut
+#               face the half prints on
+NOSE_FROM, CHANNEL_HALF = 37.0, 5.6
+POCKET_TO, POCKET_HALF = -64.0, 11.5
+FLATTER_THAN = 50.0             # degrees from the bed, facing down
+
+
+def wants_support(name, x, y, z):
+    if name == 'Car_Bottom':
+        return x > NOSE_FROM and abs(y) > CHANNEL_HALF
+    if name.startswith('Car_Red_'):
+        return x < POCKET_TO and abs(y) < POCKET_HALF
+    return False
+
+
+def supported(name, raw, verts, tris):
+    """Indices of the triangles to support: facing down in print, flatter than
+    FLATTER_THAN, where wants_support says."""
+    out = set()
+    for i, (a, b, c, _) in enumerate(tris):
+        p, q, r = verts[a], verts[b], verts[c]
+        u = [q[k] - p[k] for k in range(3)]
+        v = [r[k] - p[k] for k in range(3)]
+        n = (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
+        length = sum(w * w for w in n) ** 0.5
+        if length == 0 or -n[2] / length < math.cos(math.radians(FLATTER_THAN)):
+            continue
+        if wants_support(name, *[sum(raw[j][k] for j in (a, b, c)) / 3.0 for k in range(3)]):
+            out.add(i)
+    return out
+
+
 objects = {}
 for o in root.iter('{%s}object' % NS['c']):
     name = o.get('name')
     cols = groups[o.get('pid')]
     default = cols[int(o.get('pindex'))]
-    f = ORIENT[name]
-    verts = [f(float(v.get('x')), float(v.get('y')), float(v.get('z')))
-             for v in o.iter('{%s}vertex' % NS['c'])]
+    f = orient(name)
+    raw = [(float(v.get('x')), float(v.get('y')), float(v.get('z')))
+           for v in o.iter('{%s}vertex' % NS['c'])]
+    verts = [f(*p) for p in raw]
     tris, counts, unknown = [], collections.Counter(), collections.Counter()
     for t in o.iter('{%s}triangle' % NS['c']):
         hexc = cols[int(t.get('p1'))] if t.get('p1') is not None else default
@@ -100,7 +153,7 @@ for o in root.iter('{%s}object' % NS['c']):
         tris.append((int(t.get('v1')), int(t.get('v2')), int(t.get('v3')), fil))
     if name.startswith('Car_'):
         letter_sides(name, o, tris, counts)
-    objects[name] = (verts, tris, counts, unknown)
+    objects[name] = (verts, tris, counts, unknown, supported(name, raw, verts, tris))
 
 os.makedirs(outdir, exist_ok=True)
 CT = ('<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -113,13 +166,16 @@ RELS = ('<?xml version="1.0" encoding="UTF-8"?>\n'
         '<Relationship Target="/3D/3dmodel.model" Id="rel-1" '
         'Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
 
+pins = sorted(n for n in objects if n.startswith('Pin_'))
 for fname, parts in PLATES:
+    parts = [p for name, x, y in parts for p in (
+        [(pin, x + 10 * i, y) for i, pin in enumerate(pins)] if name == 'Pin_*' else [(name, x, y)])]
     out = ['<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" '
            'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02">\n<resources>\n']
     build = []
     report = []
     for oid, (name, px, py) in enumerate(parts, start=1):
-        verts, tris, counts, unknown = objects[name]
+        verts, tris, counts, unknown, support = objects[name]
         lo = [min(v[i] for v in verts) for i in range(3)]
         hi = [max(v[i] for v in verts) for i in range(3)]
         dx, dy, dz = px - lo[0], py - lo[1], -lo[2]
@@ -127,15 +183,18 @@ for fname, parts in PLATES:
         out.extend('<vertex x="{:.5f}" y="{:.5f}" z="{:.5f}"/>\n'.format(x + dx, y + dy, z + dz)
                    for x, y, z in verts)
         out.append('</vertices><triangles>\n')
-        for a, b, c, fil in tris:
+        for i, (a, b, c, fil) in enumerate(tris):
             paint = '' if fil == 1 else ' paint_color="{}"'.format(paint_code(fil))
+            if i in support:
+                paint += ' paint_supports="{}"'.format(paint_code(1))
             out.append('<triangle v1="{}" v2="{}" v3="{}"{}/>\n'.format(a, b, c, paint))
         out.append('</triangles></mesh></object>\n')
         build.append('<item objectid="{}"/>'.format(oid))
         report.append('  {:13s} {:6.1f} x {:5.1f} x {:5.1f} mm, at ({:.0f}, {:.0f})  '
-                      'triangles by filament {}{}'.format(
+                      'triangles by filament {}{}{}'.format(
                           name, hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2], px, py,
                           dict(sorted(counts.items())),
+                          ', {} to support'.format(len(support)) if support else '',
                           '  UNMAPPED {}'.format(dict(unknown)) if unknown else ''))
         assert px + hi[0] - lo[0] <= 246 and py + hi[1] - lo[1] <= 246, name + ' runs off the bed'
     out.append('</resources>\n<build>' + ''.join(build) + '</build>\n</model>\n')
